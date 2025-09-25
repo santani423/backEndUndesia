@@ -1,0 +1,39 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Undesia API Documentation",
+        "description": "API documentation for Undesia project",
+        "contact": {
+            "email": "support@undesia.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000",
+            "description": "Local API Server"
+        }
+    ],
+    "paths": {
+        "/api/demo": {
+            "get": {
+                "tags": [
+                    "Demo"
+                ],
+                "summary": "Get demo data",
+                "operationId": "1703af47b498000244f790649be1f0f2",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Demo",
+            "description": "Demo API endpoints"
+        }
+    ]
+}
