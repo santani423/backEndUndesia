@@ -20,4 +20,12 @@ class Theme extends Model
         'status',
         'category_id',
     ];
+
+    /**
+     * Relasi ke tabel tema_categories
+     */
+    public function category()
+    {
+        return $this->belongsTo(TemaCategory::class, 'category_id', 'id');
+    }
 }

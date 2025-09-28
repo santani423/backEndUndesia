@@ -20,4 +20,9 @@ class ThemeVideo extends Model
         'url_video',
         'category_id',
     ];
+
+     public function category()
+    {
+        return $this->belongsTo(TemaCategory::class, 'category_id', 'id');
+    }
 }

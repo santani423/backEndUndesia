@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Testimoni;
 use App\Models\Theme;
 use App\Models\ThemeVideo;
+use App\Models\TemaCategory;
 use Illuminate\Http\Request;
 
 /**
@@ -179,7 +180,15 @@ class DemoController extends Controller
     public function themes(Request $request)
     {
         $perPage = $request->get('per_page', 10);
-        $themes = Theme::orderBy('id', 'desc')->paginate($perPage);
+        $categoryId = $request->get('category_id');
+
+        $query = Theme::with('category')->orderBy('id', 'desc');
+
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
+        $themes = $query->paginate($perPage);
 
         return response()->json([
             'message' => 'List of themes',
@@ -191,18 +200,41 @@ class DemoController extends Controller
         ]);
     }
 
+
+
     public function themeVideos(Request $request)
     {
         $perPage = $request->get('per_page', 10);
-        $themes = ThemeVideo::orderBy('id_theme', 'desc')->paginate($perPage);
+        $categoryId = $request->get('category_id');
+
+        $query = ThemeVideo::with('category') // load theme + category
+            ->orderBy('id_theme', 'desc');
+
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
+        $videos = $query->paginate($perPage);
 
         return response()->json([
             'message' => 'List of theme videos',
-            'current_page' => $themes->currentPage(),
-            'per_page' => $themes->perPage(),
-            'total' => $themes->total(),
-            'last_page' => $themes->lastPage(),
-            'data' => $themes->items(),
+            'current_page' => $videos->currentPage(),
+            'per_page' => $videos->perPage(),
+            'total' => $videos->total(),
+            'last_page' => $videos->lastPage(),
+            'data' => $videos->items(),
+        ]);
+    }
+
+
+
+    public function categories(Request $request)
+    {
+        $categories = TemaCategory::getAllCategories();
+
+        return response()->json([
+            'message' => 'List of categories',
+            'data' => $categories,
         ]);
     }
 }
