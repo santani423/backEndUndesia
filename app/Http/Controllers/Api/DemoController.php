@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Testimoni;
+use App\Models\Theme;
+use App\Models\ThemeVideo;
+use Illuminate\Http\Request;
 
 /**
  * @OA\Info(
@@ -143,44 +147,62 @@ class DemoController extends Controller
      *     )
      * )
      */
-    public function testimonials()
+    public function testimonials(Request $request)
     {
-        $testimonials = [
-            [
-                'name' => 'Rina2 & Fajar',
-                'eventType' => 'Wedding',
-                'text' => 'UNDESIA membuat pernikahan kami terasa lebih eksklusif. Semua tamu mudah mengakses undangan digital kami.',
-                'avatar' => '/placeholder-avatar1.jpg'
-            ],
-            [
-                'name' => 'Sari & Ahmad',
-                'eventType' => 'Khitanan',
-                'text' => 'Undangan video animasi untuk khitanan anak kami sangat berkesan. Keluarga yang jauh bisa ikut merasakan momen bahagia ini.',
-                'avatar' => '/placeholder-avatar2.jpg'
-            ],
-            [
-                'name' => 'Maya & Budi',
-                'eventType' => 'Birthday',
-                'text' => 'Fitur QRIS dan buku tamu digital sangat memudahkan acara ulang tahun putri kami. Terima kasih UNDESIA!',
-                'avatar' => '/placeholder-avatar3.jpg'
-            ],
-            [
-                'name' => 'Dewi & Rizki',
-                'eventType' => 'Wedding',
-                'text' => 'Desain yang elegan dan fitur lengkap membuat undangan pernikahan kami terlihat profesional dan mudah digunakan.',
-                'avatar' => '/placeholder-avatar4.jpg'
-            ],
-            [
-                'name' => 'Amanda & Leo',
-                'eventType' => 'Wedding',
-                'text' => 'Desain yang elegan dan fitur lengkap membuat undangan pernikahan kami terlihat profesional dan mudah digunakan.',
-                'avatar' => '/placeholder-avatar4.jpg'
-            ],
-        ];
+        $perPage = $request->get('per_page', 5);
+        $testimonials = Testimoni::orderBy('id_testi', 'desc')->paginate($perPage);
+
+        $data = $testimonials->map(function ($item) {
+            return [
+                'id_testi'      => $item->id_testi,
+                'id_user'       => $item->id_user,
+                'nama_lengkap'  => $item->nama_lengkap ?? 'Anonymous',
+                'kota'          => $item->kota ?? 'Unknown',
+                'provinsi'      => $item->provinsi ?? 'Unknown',
+                'ulasan'        => $item->ulasan ?? 'No review',
+                'status'        => $item->status ?? 'Pending',
+                'avatar'        => '/placeholder-avatar' . rand(1, 4) . '.jpg',
+                'event_type'    => 'Wedding',
+            ];
+        });
 
         return response()->json([
             'message' => 'List of testimonials',
-            'data' => $testimonials
+            'current_page' => $testimonials->currentPage(),
+            'per_page' => $testimonials->perPage(),
+            'total' => $testimonials->total(),
+            'last_page' => $testimonials->lastPage(),
+            'data' => $data,
+        ]);
+    }
+
+    public function themes(Request $request)
+    {
+        $perPage = $request->get('per_page', 10);
+        $themes = Theme::orderBy('id', 'desc')->paginate($perPage);
+
+        return response()->json([
+            'message' => 'List of themes',
+            'current_page' => $themes->currentPage(),
+            'per_page' => $themes->perPage(),
+            'total' => $themes->total(),
+            'last_page' => $themes->lastPage(),
+            'data' => $themes->items(),
+        ]);
+    }
+
+    public function themeVideos(Request $request)
+    {
+        $perPage = $request->get('per_page', 10);
+        $themes = ThemeVideo::orderBy('id_theme', 'desc')->paginate($perPage);
+
+        return response()->json([
+            'message' => 'List of theme videos',
+            'current_page' => $themes->currentPage(),
+            'per_page' => $themes->perPage(),
+            'total' => $themes->total(),
+            'last_page' => $themes->lastPage(),
+            'data' => $themes->items(),
         ]);
     }
 }
