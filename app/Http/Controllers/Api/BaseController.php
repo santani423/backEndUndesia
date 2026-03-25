@@ -73,7 +73,7 @@ class BaseController extends Controller
                 'features' => [
                     [
                         'name' => 'Buku Tamu',
-                        'param' => $item->buku_tamu
+                        'is_available' => $item->buku_tamu
                     ]
                 ],
             ];
