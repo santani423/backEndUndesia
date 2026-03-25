@@ -82,7 +82,7 @@ class DemoController extends Controller
         $data = [
             'message' => 'Demo API works',
             'demos' => [
-                'website' => $website,
+                'websitewww' => $website,
                 'video' => [
                     [
                         'title' => 'Wedding Video Invitation',
