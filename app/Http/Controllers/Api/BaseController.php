@@ -65,9 +65,22 @@ class BaseController extends Controller
     public function paket()
     {
         $paket = Paket::all();
+        $newData = $paket->map(function ($item) {
+            return [
+                'id' => $item->id_paket,
+                'nama_paket' => $item->nama_paket,
+                'harga' => $item->harga_paket,
+                'features' => [
+                    [
+                        'name' => 'Nama Fitur',
+                        'description' => $item->import_datatamu
+                    ]
+                ],
+            ];
+        });
         $data = [
-            'message' => 'Demo API works',
-            'paket'   => $paket,   
+            'message' => 'Daftar Paket Undangan',
+            'paket'   => $newData,
         ];
 
         return response()->json($data);
