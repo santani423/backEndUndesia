@@ -69,7 +69,7 @@ class BaseController extends Controller
             return [
                 'id' => $item->id_paket,
                 'nama_paket' => $item->nama_paket,
-                'harga' => $item->harga_paket,
+                'harga_paket' => $item->harga_paket,
                 'features' => [
                     [
                         'name' => $item->id_paket == 1 ? 'Hanya 1 Tema' : 'Bebas Pilih Tema',
