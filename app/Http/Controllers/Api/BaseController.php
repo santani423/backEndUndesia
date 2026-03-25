@@ -68,9 +68,10 @@ class BaseController extends Controller
         $newData = $paket->map(function ($item) {
             return [
                 'id' => $item->id_paket,
-                'nama_paket' => $item->nama_paket,
-                'harga_paket' => $item->harga_paket,
+                'name' => $item->nama_paket,
+                'price' => $item->harga_paket,
                 'popular' => $item->id_paket == 2,
+                'cta' => "Pesan Sekarang",
                 'features' => [
                     [
                         'name' => $item->id_paket == 1 ? 'Hanya 1 Tema' : 'Bebas Pilih Tema',
