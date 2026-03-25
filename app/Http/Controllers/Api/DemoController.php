@@ -70,7 +70,7 @@ class DemoController extends Controller
      */
     public function index()
     {
-        $themes = Theme::all();
+       $themes = Theme::orderBy('created_at', 'desc')->limit(10)->get();
         $website = $themes->map(function ($item) {
             return [
                 'title' => $item->nama_theme,
