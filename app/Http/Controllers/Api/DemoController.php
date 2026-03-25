@@ -70,10 +70,11 @@ class DemoController extends Controller
      */
     public function index()
     {
-       $themes = Theme::with('category')->orderBy('created_at', 'desc')->limit(10)->get();
+       $themes = Theme::with('category')->where('status', 1)->orderBy('created_at', 'desc')->limit(10)->get();
         $website = $themes->map(function ($item) {
             return [
                 'title' => $item->nama_theme,
+                'kode_theme' => $item->kode_theme,
                 'description' => 'description',
                 'category' => $item->category->name ?? 'Uncategorized',
                 'thumbnail' => 'https://www.undesia.com/assets/themes/' . $item->nama_theme . '/preview.png'
@@ -172,7 +173,7 @@ class DemoController extends Controller
         $perPage = $request->get('per_page', 10);
         $categoryId = $request->get('category_id');
 
-        $query = Theme::with('category')->orderBy('id', 'desc');
+        $query = Theme::with('category')->where('status', 1)->orderBy('id', 'desc');
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);
