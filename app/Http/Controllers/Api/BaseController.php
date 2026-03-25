@@ -73,7 +73,7 @@ class BaseController extends Controller
                 'features' => [
                     [
                         'name' => $item->id_paket == 1 ? 'Hanya 1 Tema' : 'Bebas Pilih Tema',
-                        'is_available' => $item->buku_tamu
+                        'is_available' => 1
                     ],
                     [
                         'name' => 'Edit Tanpa Batas',
