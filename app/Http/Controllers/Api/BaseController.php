@@ -72,9 +72,49 @@ class BaseController extends Controller
                 'harga' => $item->harga_paket,
                 'features' => [
                     [
+                        'name' => $item->id_paket == 1 ? 'Hanya 1 Tema' : 'Bebas Pilih Tema',
+                        'is_available' => $item->buku_tamu
+                    ],
+                    [
+                        'name' => 'Edit Tanpa Batas',
+                        'is_available' => 1
+                    ],
+                    [
+                        'name' => 'Kirim Undangan',
+                        'is_available' => $item->kirim_whatsapp
+                    ],
+                    [
+                        'name' => 'Import Data Tamu',
+                        'is_available' => $item->import_datatamu
+                    ],
+                    [
                         'name' => 'Buku Tamu',
                         'is_available' => $item->buku_tamu
-                    ]
+                    ],
+                    [
+                        'name' => 'Amplop Digital',
+                        'is_available' => $item->kirim_hadiah
+                    ],
+                    [
+                        'name' => 'Galeri Foto',
+                        'is_available' => 1
+                    ],
+                    [
+                        'name' => 'Background Music',
+                        'is_available' => 1
+                    ],
+                    [
+                        'name' => 'Love Story',
+                        'is_available' => 1
+                    ],
+                    [
+                        'name' => 'Countdown',
+                        'is_available' => 1
+                    ],
+                    [
+                        'name' => 'Rsvp',
+                        'is_available' => 1
+                    ],
                 ],
             ];
         });
