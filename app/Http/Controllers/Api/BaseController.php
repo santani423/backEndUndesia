@@ -105,10 +105,10 @@ class BaseController extends Controller
                         'name' => 'Background Music',
                         'is_available' => 1
                     ],
-                    [
-                        'name' => 'Love Story',
-                        'is_available' => 1
-                    ],
+                    // [
+                    //     'name' => 'Love Story',
+                    //     'is_available' => 1
+                    // ],
                     [
                         'name' => 'Countdown',
                         'is_available' => 1
