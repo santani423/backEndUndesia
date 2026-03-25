@@ -72,8 +72,8 @@ class BaseController extends Controller
                 'harga' => $item->harga_paket,
                 'features' => [
                     [
-                        'name' => 'Nama Fitur',
-                        'description' => $item->import_datatamu
+                        'name' => 'Buku Tamu',
+                        'param' => $item->buku_tamu
                     ]
                 ],
             ];
