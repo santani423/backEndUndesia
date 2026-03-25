@@ -70,29 +70,19 @@ class DemoController extends Controller
      */
     public function index()
     {
+        $themes = Theme::all();
+        $website = $themes->map(function ($item) {
+            return [
+                'title' => $item->nama_theme,
+                'description' => 'description',
+                'category' => $item->category_id,
+                'thumbnail' => 'https://www.undesia.com/assets/themes/' . $item->nama_theme . '/preview.png'
+            ];
+        });
         $data = [
             'message' => 'Demo API works',
             'demos' => [
-                'website' => [
-                    [
-                        'title' => 'Wedding Theme',
-                        'description' => 'Pastel gold elegant',
-                        'category' => 'Pernikahan',
-                        'thumbnail' => '/placeholder-wedding.jpg'
-                    ],
-                    [
-                        'title' => 'Khitanan Theme',
-                        'description' => 'Hijau islami',
-                        'category' => 'Khitanan',
-                        'thumbnail' => '/placeholder-khitanan.jpg'
-                    ],
-                    [
-                        'title' => 'Birthday Theme',
-                        'description' => 'Ceria balloons',
-                        'category' => 'Ulang Tahun',
-                        'thumbnail' => '/placeholder-birthday.jpg'
-                    ]
-                ],
+                'website' => $website,
                 'video' => [
                     [
                         'title' => 'Wedding Video Invitation',
