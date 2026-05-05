@@ -10,9 +10,18 @@ class TemaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'code' => 'nullable|string|in:top,bottom,left,right',
+        ]);
+
+        $query = Tema::with('asset')->where('code', $validated['code'])->get();
+
+        return response()->json([
+            'message' => 'List of themes',
+            'data' => $query->items(),
+        ]);
     }
 
     /**
