@@ -66,6 +66,10 @@ class TemaController extends Controller
         $size = SizeTema::find($assetSize->size_tema_id);
 
         $updateNo = $request->plesMinus == '+' ? $size->no + 1: $size->no - 1;
+
+        $size2 = SizeTema::where('no',$updateNo)->where('type',$size->type)->find;
+        $assetSize->size_tema_id = $size2->id;
+        $assetSize->save();
         
         return response()->json([
             'message' => 'List of themes',
