@@ -19,7 +19,7 @@ class TemaController extends Controller
         $query = Tema::where('code', 'TEMA1')->get();
 
         return response()->json([
-            'message' => 'List of themes',
+            'message' => 'List of themesWWWW',
             'data' => $query,
         ]);
     }
