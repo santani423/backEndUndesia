@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Asset;
-use App\Models\BreakPoint;
+use App\Models\BreackPoin;
 use App\Models\SizeTema;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -44,7 +44,7 @@ class Tema1Seeder extends Seeder
 
         // Ambil ulang assets & breakpoint
         $assets = Asset::where('tema_id', $temaId)->get();
-        $breakpoints = BreakPoint::all();
+        $breakpoints = BreackPoin::all();
 
         // Ambil size tema default (misalnya top-1)
         $defaultSize = SizeTema::where('type', 'top')->where('no', 1)->first();
