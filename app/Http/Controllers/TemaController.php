@@ -64,12 +64,15 @@ class TemaController extends Controller
         ->where('breack_poin_id',$breakpoint->id)
         ->first();
         $size = SizeTema::find($assetSize->size_tema_id);
+
+        $updateNo = $request->plesMinus == '+' ? $size->no + 1: $size->no - 1;
         
         return response()->json([
             'message' => 'List of themes',
             'data' => $request->all(),
             'assetSize' => $assetSize,
             'size' => $size,
+            'updateNo' => $updateNo,
         ]);
     }
 
