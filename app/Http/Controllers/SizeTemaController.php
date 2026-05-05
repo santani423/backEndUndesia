@@ -10,9 +10,36 @@ class SizeTemaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'type' => 'nullable|string|in:top,bottom,left,right',
+            'no'   => 'nullable|integer|min:1',
+        ]);
+
+        $query = SizeTema::query();
+
+        if (!empty($validated['type'])) {
+            $query->where('type', $validated['type']);
+        }
+
+        if (!empty($validated['no'])) {
+            $query->where('no', $validated['no']);
+        }
+
+        $data = $query->get();
+
+        if ($data->isEmpty()) {
+            return response()->json([
+                'message' => 'Data tidak ditemukan',
+                'data' => [],
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'List of themes',
+            'data' => $data,
+        ]);
     }
 
     /**

@@ -182,13 +182,13 @@ class DemoController extends Controller
         $themes = $query->paginate($perPage);
 
         return response()->json([
-            'message' => 'List of themes',
-            'current_page' => $themes->currentPage(),
-            'per_page' => $themes->perPage(),
-            'total' => $themes->total(),
-            'last_page' => $themes->lastPage(),
-            'data' => $themes->items(),
-        ]);
+                'message' => 'List of themes',
+                'current_page' => $themes->currentPage(),
+                'per_page' => $themes->perPage(),
+                'total' => $themes->total(),
+                'last_page' => $themes->lastPage(),
+                'data' => $themes->items(),
+            ]);
     }
 
 
