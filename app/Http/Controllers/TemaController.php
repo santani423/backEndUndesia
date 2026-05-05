@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\AssetSize;
 use App\Models\BreackPoin;
+use App\Models\SizeTema;
 use App\Models\Tema;
 use Illuminate\Http\Request;
 
@@ -62,11 +63,13 @@ class TemaController extends Controller
         $assetSize = AssetSize::where('asset_id',$request->asset_id) 
         ->where('breack_poin_id',$breakpoint->id)
         ->first();
+        $size = SizeTema::find($assetSize->size_tema_id);
         
         return response()->json([
             'message' => 'List of themes',
             'data' => $request->all(),
-            'assetSize' => $assetSize
+            'assetSize' => $assetSize,
+            'size' => $size,
         ]);
     }
 
