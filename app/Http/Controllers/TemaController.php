@@ -66,10 +66,10 @@ class TemaController extends Controller
             'plesMinus'  => 'required|in:+,-',
         ]);
 
-          return response()->json([
-            'status' => true,
-            'message' => 'Size berhasil diupdate', 
-        ]);
+        //   return response()->json([
+        //     'status' => true,
+        //     'message' => 'Size berhasil diupdate', 
+        // ]);
 
         // Ambil breakpoint
         $breakpoint = BreackPoin::where('code', $validated['breakpoint'])->first();
