@@ -76,13 +76,13 @@ class TemaController extends Controller
                 'message' => 'Breakpoint tidak ditemukan',
             ], 404);
         }
-        return response()->json([
-            'status' => true,
-            'message' => '85', 
-        ]);
+        // return response()->json([
+        //     'status' => true,
+        //     'message' => '85', 
+        // ]);
         // Ambil asset size
         $assetSize = AssetSize::where('asset_id', $validated['asset_id'])
-            ->where('break_point_id', $breakpoint->id)
+            ->where('breack_poin_id', $breakpoint->id)
             ->first();
 
         if (!$assetSize) {
