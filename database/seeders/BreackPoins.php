@@ -20,6 +20,6 @@ class BreakPointsSeeder extends Seeder
             ['name' => 'tb',     'code' => 'tb',     'size' => '900px'],
         ];
 
-        DB::table('breakpoints')->insert($breakpoints);
+        DB::table('breack_poins')->insert($breakpoints);
     }
 }
