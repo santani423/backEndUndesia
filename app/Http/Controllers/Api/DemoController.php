@@ -228,4 +228,9 @@ class DemoController extends Controller
             'data' => $categories,
         ]);
     }
+
+
+    public function FunctionName() {
+        return 'top-40';
+    }
 }
