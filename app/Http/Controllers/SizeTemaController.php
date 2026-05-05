@@ -19,27 +19,23 @@ class SizeTemaController extends Controller
 
         $query = SizeTema::query();
 
-        if (!empty($validated['type'])) {
+        if (isset($validated['type'])) {
             $query->where('type', $validated['type']);
         }
 
-        if (!empty($validated['no'])) {
+        if (isset($validated['no'])) {
             $query->where('no', $validated['no']);
         }
 
         $data = $query->get();
 
-        if ($data->isEmpty()) {
-            return response()->json([
-                'message' => 'Data tidak ditemukan',
-                'data' => [],
-            ], 404);
-        }
+        $isEmpty = $data->isEmpty();
 
         return response()->json([
-            'message' => 'List of themes',
-            'data' => $data,
-        ]);
+            'status'  => !$isEmpty,
+            'message' => $isEmpty ? 'Data tidak ditemukan' : 'List of themes',
+            'data'    => $data,
+        ], $isEmpty ? 404 : 200);
     }
 
     /**
