@@ -59,24 +59,75 @@ class TemaController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(Request $request)
-    {   $breakpoint = BreackPoin::where('code',$request->breakpoint)->first();
-        $assetSize = AssetSize::where('asset_id',$request->asset_id) 
-        ->where('breack_poin_id',$breakpoint->id)
-        ->first();
+    {
+        $validated = $request->validate([
+            'asset_id'   => 'required|integer',
+            'breakpoint' => 'required|string',
+            'plesMinus'  => 'required|in:+,-',
+        ]);
+
+        // Ambil breakpoint
+        $breakpoint = BreackPoin::where('code', $validated['breakpoint'])->first();
+        if (!$breakpoint) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Breakpoint tidak ditemukan',
+            ], 404);
+        }
+
+        // Ambil asset size
+        $assetSize = AssetSize::where('asset_id', $validated['asset_id'])
+            ->where('break_point_id', $breakpoint->id)
+            ->first();
+
+        if (!$assetSize) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Asset size tidak ditemukan',
+            ], 404);
+        }
+
+        // Ambil size sekarang
         $size = SizeTema::find($assetSize->size_tema_id);
+        if (!$size) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Size tema tidak ditemukan',
+            ], 404);
+        }
 
-        $updateNo = $request->plesMinus == '+' ? $size->no + 1: $size->no - 1;
+        // Hitung no baru
+        $updateNo = $validated['plesMinus'] === '+'
+            ? $size->no + 1
+            : $size->no - 1;
 
-        $size2 = SizeTema::where('no',$updateNo)->where('type',$size->type)->find;
+        // Ambil size tujuan
+        $size2 = SizeTema::where('no', $updateNo)
+            ->where('type', $size->type)
+            ->first();
+
+        if (!$size2) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Size tujuan tidak tersedia',
+                'updateNo' => $updateNo,
+            ], 400);
+        }
+
+        // Update
         $assetSize->size_tema_id = $size2->id;
         $assetSize->save();
-        
+
         return response()->json([
-            'message' => 'List of themes',
-            'data' => $request->all(),
-            'assetSize' => $assetSize,
-            'size' => $size,
-            'updateNo' => $updateNo,
+            'status' => true,
+            'message' => 'Size berhasil diupdate',
+            'data' => [
+                'asset_id' => $validated['asset_id'],
+                'breakpoint' => $validated['breakpoint'],
+                'old_size' => $size,
+                'new_size' => $size2,
+                'updateNo' => $updateNo,
+            ],
         ]);
     }
 
