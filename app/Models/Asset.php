@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Asset extends Model
 {
-    public function asset()
+    public function assetSizes()
     {
-        return $this->belongsTo(AssetSize::class, 'asset_id', 'id');
+        return $this->hasMany(AssetSize::class, 'asset_id', 'id');
     }
 }
