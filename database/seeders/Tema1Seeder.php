@@ -60,7 +60,7 @@ class Tema1Seeder extends Seeder
                 $insertData[] = [
                     'asset_id' => $asset->id,
                     'size_tema_id' => $defaultSize->id,
-                    'break_point_id' => $bp->id,
+                    'breack_poin_id' => $bp->id,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
