@@ -8,6 +8,6 @@ class Tema extends Model
 {
     public function asset()
     {
-        return $this->hasMany(Asset::class, 'id', 'tema_id');
+        return $this->hasMany(Asset::class, 'tema_id', 'id');
     }
 }
