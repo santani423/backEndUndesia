@@ -20,7 +20,7 @@ class TemaController extends Controller
 
         return response()->json([
             'message' => 'List of themes',
-            'data' => $query->items(),
+            'data' => $query,
         ]);
     }
 
