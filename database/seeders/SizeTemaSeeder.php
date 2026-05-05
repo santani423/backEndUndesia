@@ -25,11 +25,11 @@ class SizeTemaSeeder extends Seeder
                 $data[] = [
                     'type' => $type,
                     'no'   => $index + 1,
-                    'code' => $type . '-' . $value,
+                    'value' => $type . '-' . $value,
                 ];
             }
         }
 
-        DB::table('size')->insert($data);
+        DB::table('size_temas')->insert($data);
     }
 }
