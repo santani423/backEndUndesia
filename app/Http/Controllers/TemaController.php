@@ -16,7 +16,7 @@ class TemaController extends Controller
         //     'code' => 'nullable|string|in:top,bottom,left,right',
         // ]);
 
-        // $query = Tema::where('code', $validated['code'])->get();
+        $query = Tema::where('code', 'TEMA1')->get();
 
         return response()->json([
             'message' => 'List of themes',
