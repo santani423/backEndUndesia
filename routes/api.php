@@ -9,6 +9,7 @@ use App\Http\Controllers\TemaController;
 Route::get('/demo', [DemoController::class, 'index']);
 Route::get('/size', [SizeTemaController::class, 'index']);
 Route::get('/tema', [TemaController::class, 'index']);
+Route::put('/tema', [TemaController::class, 'edit']);
 
 Route::get('/testimonials', [DemoController::class, 'testimonials']);
 Route::get('/themes', [DemoController::class, 'themes']);

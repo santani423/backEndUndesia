@@ -54,9 +54,12 @@ class TemaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Tema $tema)
+    public function edit(Request $request)
     {
-        //
+        return response()->json([
+            'message' => 'List of themes',
+            'data' => $request->all(),
+        ]);
     }
 
     /**
