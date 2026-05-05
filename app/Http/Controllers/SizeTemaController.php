@@ -27,9 +27,9 @@ class SizeTemaController extends Controller
             $query->where('no', $validated['no']);
         }
 
-        $data = $query->first();
+        $data = $query->get();
 
-        if (!$data) {
+        if ($data->isEmpty()) {
             return response()->json([
                 'message' => 'Data tidak ditemukan',
                 'data' => [],
