@@ -66,10 +66,7 @@ class TemaController extends Controller
             'plesMinus'  => 'required|in:+,-',
         ]);
 
-        //   return response()->json([
-        //     'status' => true,
-        //     'message' => 'Size berhasil diupdate', 
-        // ]);
+         
 
         // Ambil breakpoint
         $breakpoint = BreackPoin::where('code', $validated['breakpoint'])->first();
@@ -79,7 +76,10 @@ class TemaController extends Controller
                 'message' => 'Breakpoint tidak ditemukan',
             ], 404);
         }
-
+ return response()->json([
+            'status' => true,
+            'message' => 'Size berhasil diupdate', 
+        ]);
         // Ambil asset size
         $assetSize = AssetSize::where('asset_id', $validated['asset_id'])
             ->where('break_point_id', $breakpoint->id)
