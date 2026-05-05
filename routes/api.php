@@ -11,7 +11,7 @@ Route::get('/themes', [DemoController::class, 'themes']);
 Route::get('/themeVideos', [DemoController::class, 'themeVideos']);
 Route::get('/categories', [DemoController::class, 'categories']);
 
-Route::get('/template', [DemoController::class, 'themes']);
+Route::get('/template', [DemoController::class, 'FunctionName']);
 Route::get('/paket', [BaseController::class, 'paket']);
 
 

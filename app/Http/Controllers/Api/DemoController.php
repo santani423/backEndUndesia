@@ -230,7 +230,7 @@ class DemoController extends Controller
     }
 
 
-    public function FunctionName() {
+    public function  FunctionName() {
         return 'top-40';
     }
 }
