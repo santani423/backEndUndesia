@@ -76,10 +76,6 @@ class TemaController extends Controller
                 'message' => 'Breakpoint tidak ditemukan',
             ], 404);
         }
- return response()->json([
-            'status' => true,
-            'message' => 'Size berhasil diupdate', 
-        ]);
         // Ambil asset size
         $assetSize = AssetSize::where('asset_id', $validated['asset_id'])
             ->where('break_point_id', $breakpoint->id)
@@ -91,6 +87,10 @@ class TemaController extends Controller
                 'message' => 'Asset size tidak ditemukan',
             ], 404);
         }
+ return response()->json([
+            'status' => true,
+            'message' => 'Size berhasil diupdate', 
+        ]);
 
         // Ambil size sekarang
         $size = SizeTema::find($assetSize->size_tema_id);
