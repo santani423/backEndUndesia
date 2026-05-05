@@ -29,7 +29,7 @@ class SizeTemaController extends Controller
 
         $data = $query->first();
 
-        if ($data->isEmpty()) {
+        if (!$data) {
             return response()->json([
                 'message' => 'Data tidak ditemukan',
                 'data' => [],
