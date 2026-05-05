@@ -16,10 +16,10 @@ class TemaController extends Controller
         //     'code' => 'nullable|string|in:top,bottom,left,right',
         // ]);
 
-        $query = Tema::where('code', 'TEMA1')->get();
+        $query = Tema::with('asset')->where('code', 'TEMA1')->get();
 
         return response()->json([
-            'message' => 'List of themesWWWW',
+            'message' => 'List of themes',
             'data' => $query,
         ]);
     }
