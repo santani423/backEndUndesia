@@ -12,15 +12,15 @@ class TemaController extends Controller
      */
     public function index(Request $request)
     {
-        $validated = $request->validate([
-            'code' => 'nullable|string|in:top,bottom,left,right',
-        ]);
+        // $validated = $request->validate([
+        //     'code' => 'nullable|string|in:top,bottom,left,right',
+        // ]);
 
-        $query = Tema::where('code', $validated['code'])->get();
+        // $query = Tema::where('code', $validated['code'])->get();
 
         return response()->json([
             'message' => 'List of themes',
-            'data' => $query,
+            // 'data' => $query,
         ]);
     }
 
