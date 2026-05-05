@@ -70,7 +70,7 @@ class DemoController extends Controller
      */
     public function index()
     {
-       $themes = Theme::with('category')->where('status', 1)->orderBy('created_at', 'desc')->limit(10)->get();
+        $themes = Theme::with('category')->where('status', 1)->orderBy('created_at', 'desc')->limit(10)->get();
         $website = $themes->map(function ($item) {
             return [
                 'title' => $item->nama_theme,
@@ -230,7 +230,11 @@ class DemoController extends Controller
     }
 
 
-    public function  FunctionName() {
-        return 'top-40';
+    public function  FunctionName()
+    {
+        return response()->json([
+            'message' => 'List of categories',
+            'data' => 'top-40',
+        ]);
     }
 }
