@@ -56,9 +56,11 @@ class TemaController extends Controller
      */
     public function edit(Request $request)
     {
+        $tema = Tema::where('code',$request->tema)->first();
         return response()->json([
             'message' => 'List of themes',
             'data' => $request->all(),
+            'tema' => $tema
         ]);
     }
 
