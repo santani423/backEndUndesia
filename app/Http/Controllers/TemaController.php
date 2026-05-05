@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asset;
+use App\Models\AssetSize;
+use App\Models\BreackPoin;
 use App\Models\Tema;
 use Illuminate\Http\Request;
 
@@ -55,12 +58,15 @@ class TemaController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(Request $request)
-    {
-        $tema = Tema::where('code',$request->tema)->first();
+    {   $breakpoint = BreackPoin::where('code',$request->breakpoint)->first();
+        $assetSize = AssetSize::where('asset_id',$request->asset_id) 
+        ->where('breack_poin_id',$breakpoint->id)
+        ->first();
+        
         return response()->json([
             'message' => 'List of themes',
             'data' => $request->all(),
-            'tema' => $tema
+            'assetSize' => $assetSize
         ]);
     }
 
