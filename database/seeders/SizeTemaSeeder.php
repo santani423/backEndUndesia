@@ -30,6 +30,6 @@ class SizeTemaSeeder extends Seeder
             }
         }
 
-        DB::table('temas')->insert($data);
+        DB::table('size_temas')->insert($data);
     }
 }
