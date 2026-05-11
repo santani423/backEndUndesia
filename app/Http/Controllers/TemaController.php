@@ -60,10 +60,7 @@ class TemaController extends Controller
      */
     public function edit(Request $request)
     {
-         return response()->json([
-                'status' => false,
-                'message' => 'Breakpoint tidak ditemukan',
-            ], 200);
+         
         $validated = $request->validate([
             'asset_id'   => 'required|integer',
             'breakpoint' => 'required|string',
