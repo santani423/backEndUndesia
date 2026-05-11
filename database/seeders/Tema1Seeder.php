@@ -27,8 +27,8 @@ class Tema1Seeder extends Seeder
         $assetsData = [
             [
                 'tema_id' => $temaId,
-                'path' => 'alamat.png',
-                'name' => 'alamat',
+                'path' => 'gallery.png',
+                'name' => 'gallery',
                 'type' => 'item',
                 'created_at' => now(),
                 'updated_at' => now(),
