@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BreackPoin;
 use App\Models\SizeTema;
 use Illuminate\Http\Request;
 
@@ -84,5 +85,13 @@ class SizeTemaController extends Controller
     public function destroy(SizeTema $sizeTema)
     {
         //
+    }
+    public function brackPoin(SizeTema $sizeTema)
+    {
+        $data = BreackPoin::all(); 
+         return response()->json([
+            'message' => 'List of themes',
+            'data' => $data,
+        ]);
     }
 }
