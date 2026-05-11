@@ -12,6 +12,9 @@ class Tema1Seeder extends Seeder
 {
     public function run(): void
     {
+        DB::table('temas')->truncate();
+        DB::table('assets')->truncate();
+        DB::table('asset_sizes')->truncate();
         // Insert tema
         $temaId = DB::table('temas')->insertGetId([
             'name' => 'Tema 1',
