@@ -70,4 +70,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Data::class, 'id_user');
     }
+
+    public function acara()
+    {
+        return $this->hasMany(Acara::class, 'id_user');
+    }
 }
