@@ -50,4 +50,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Mempelai::class, 'id_user');
     }
+
+    public function album()
+    {
+        return $this->hasOne(Album::class, 'id_user');
+    }
 }
