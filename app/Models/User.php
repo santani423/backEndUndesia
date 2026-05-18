@@ -75,4 +75,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Acara::class, 'id_user');
     }
+
+    public function rekening()
+    {
+        return $this->hasMany(Rekening::class, 'id_user');
+    }
 }
