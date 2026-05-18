@@ -55,4 +55,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Album::class, 'id_user');
     }
+
+    public function cerita()
+    {
+        return $this->hasMany(Cerita::class, 'id_user');
+    }
 }
