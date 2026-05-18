@@ -19,6 +19,12 @@ class DomainController extends Controller
     public function show(Request $request, $id)
     {
         $domain = Order::where('domain', $id)->first();
+
+        if (!$domain) {
+            return response()->json([
+                'message' => 'Domain not found',
+            ], 404);
+        }
         return response()->json([
             'message' => 'Domain details',
             'data' => $domain,
