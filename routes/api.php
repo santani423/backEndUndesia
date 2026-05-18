@@ -5,11 +5,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\DemoController;
 use App\Http\Controllers\SizeTemaController;
 use App\Http\Controllers\TemaController;
+use App\Http\Controllers\Api\DomainController;
 
 Route::get('/demo', [DemoController::class, 'index']);
 Route::get('/size', [SizeTemaController::class, 'index']);
 Route::get('/brackPoin', [SizeTemaController::class, 'brackPoin']);
 Route::get('/tema', [TemaController::class, 'index']);
+Route::get('/domains', [DomainController::class, 'index']);
 Route::put('/tema', [TemaController::class, 'edit']);
 
 Route::get('/testimonials', [DemoController::class, 'testimonials']);
