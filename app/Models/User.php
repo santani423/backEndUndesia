@@ -60,4 +60,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Cerita::class, 'id_user');
     }
+
+    public function quote()
+    {
+        return $this->hasOne(Quote::class, 'id_user');
+    }
 }
