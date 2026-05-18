@@ -46,7 +46,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function getMempelai()
+    public function mempelai()
     {
         return $this->hasOne(Mempelai::class, 'id_user');
     }

@@ -8,7 +8,7 @@ class Order extends Model
 {
      protected $table = 'order';
 
-     public function getUser()
+     public function user()
      {
          return $this->belongsTo(User::class, 'id_user');
      }
