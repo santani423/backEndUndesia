@@ -18,7 +18,7 @@ class DomainController extends Controller
 
     public function show(Request $request, $id)
     {
-        $domain = Order::when('getUser')->where('domain', $id)->first();
+        $domain = Order::with('getUser')->where('domain', $id)->first();
 
         if (!$domain) {
             return response()->json([
