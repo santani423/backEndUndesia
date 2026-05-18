@@ -14,4 +14,12 @@ class DomainController extends Controller
             'data' => [],
         ]);
     }
+
+    public function show(Request $request, $id)
+    {
+        return response()->json([
+            'message' => 'Domain details',
+            'data' => [],
+        ]);
+    }
 }
