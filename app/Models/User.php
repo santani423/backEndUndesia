@@ -53,6 +53,6 @@ class User extends Authenticatable
 
     public function album()
     {
-        return $this->hasOne(Album::class, 'id_user');
+        return $this->hasMany(Album::class, 'id_user');
     }
 }
