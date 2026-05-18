@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Mempelai extends Model
 {
-    //
+    protected $table = 'mempelai';
 }
