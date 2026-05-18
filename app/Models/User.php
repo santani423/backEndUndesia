@@ -65,4 +65,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Quote::class, 'id_user');
     }
+
+    public function data()
+    {
+        return $this->hasOne(Data::class, 'id_user');
+    }
 }
