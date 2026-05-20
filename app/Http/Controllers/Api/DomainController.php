@@ -40,7 +40,7 @@ class DomainController extends Controller
         return response()->json([
             'message' => 'Domain details',
             'data' => $domain,
-            // 'tamu' => $tamu,
+            'tamu' => $tamu,
         ]);
     }
 }
