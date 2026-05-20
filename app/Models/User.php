@@ -83,6 +83,6 @@ class User extends Authenticatable
 
     public function rules()
     {
-        return $this->hasMany(Rules::class, 'id_user');
+        return $this->hasOne(Rules::class, 'id_user');
     }
 }
