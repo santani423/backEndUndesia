@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Tamu;
 use Illuminate\Http\Request;
 
 class DomainController extends Controller
@@ -27,7 +28,9 @@ class DomainController extends Controller
             'user.acara',
             'user.rekening',
             'user.rules',
-            )->where('domain', $id)->first();
+        )->where('domain', $id)->first();
+
+        $tamu = Tamu::where('slig', $request->slig)->where('user_id', $domain->user->id)->first();
 
         if (!$domain) {
             return response()->json([
@@ -37,6 +40,7 @@ class DomainController extends Controller
         return response()->json([
             'message' => 'Domain details',
             'data' => $domain,
+            'tamu' => $tamu,
         ]);
     }
 }
