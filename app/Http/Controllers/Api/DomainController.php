@@ -30,7 +30,7 @@ class DomainController extends Controller
             'user.rules',
         )->where('domain', $id)->first();
 
-        $tamu = Tamu::where('slig', $request->slig)->where('user_id', $domain->user->id)->first();
+        $tamu = Tamu::where('nama_slig', $request->slig)->where('user_id', $domain->user->id)->first();
 
         if (!$domain) {
             return response()->json([
