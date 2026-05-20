@@ -80,4 +80,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Rekening::class, 'id_user');
     }
+
+    public function rules()
+    {
+        return $this->hasMany(Rules::class, 'id_user');
+    }
 }

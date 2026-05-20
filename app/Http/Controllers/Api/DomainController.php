@@ -25,7 +25,8 @@ class DomainController extends Controller
             'user.quote',
             'user.data',
             'user.acara',
-            'user.rekening'
+            'user.rekening',
+            'user.rules',
             )->where('domain', $id)->first();
 
         if (!$domain) {
