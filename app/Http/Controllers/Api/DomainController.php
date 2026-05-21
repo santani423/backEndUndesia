@@ -43,4 +43,12 @@ class DomainController extends Controller
             'tamu' => $tamu,
         ]);
     }
+
+    public function komentar(Request $request)
+    {
+        return response()->json([
+            'message' => 'List of komentar',
+            'data' => [],
+        ]);
+    }
 }
