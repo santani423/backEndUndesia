@@ -13,6 +13,7 @@ Route::get('/brackPoin', [SizeTemaController::class, 'brackPoin']);
 Route::get('/tema', [TemaController::class, 'index']);
 Route::get('/domains', [DomainController::class, 'index']);
 Route::get('/domains/{id}', [DomainController::class, 'show']);
+Route::get('/komentar', [DomainController::class, 'komentarAll']);
 Route::post('/komentar', [DomainController::class, 'komentar']);
 Route::put('/tema', [TemaController::class, 'edit']);
 

@@ -71,4 +71,21 @@ class DomainController extends Controller
             ], 500);
         }
     }
+
+    public function komentarAll(Request $request)
+    {
+        try {
+            $komentar = Komen::where('id_user', $request->id_user)->get();
+
+            return response()->json([
+                'message' => $komentar->isEmpty() ? 'Tidak ada komentar untuk user ini' : 'List komentar',
+                'data' => $komentar,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal mengambil komentar',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
