@@ -75,7 +75,7 @@ class DomainController extends Controller
     public function komentarAll(Request $request)
     {
         try {
-            $komentar = Komen::where('id_user', $request->id_user)->get();
+            $komentar = Komen::where('id_user', $request->id_user)->orderBy('created_at', 'desc')->get();
 
             return response()->json([
                 'message' => $komentar->isEmpty() ? 'Tidak ada komentar untuk user ini' : 'List komentar',
