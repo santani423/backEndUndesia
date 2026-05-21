@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Komen;
 use App\Models\Order;
 use App\Models\Tamu;
 use Illuminate\Http\Request;
@@ -46,9 +47,28 @@ class DomainController extends Controller
 
     public function komentar(Request $request)
     {
-        return response()->json([
-            'message' => 'List of komentar',
-            'data' => [],
+        $request->validate([
+            'id_user' => 'required',
+            'nama' => 'required|string|max:255',
+            'komen' => 'required|string',
         ]);
+
+        try {
+            $komen = Komen::create([
+                'id_user' => $request->id_user,
+                'nama_komentar' => $request->nama,
+                'isi_komentar' => $request->komen,
+            ]);
+
+            return response()->json([
+                'message' => 'Komentar berhasil ditambahkan',
+                'data' => $komen,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal menambahkan komentar',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
