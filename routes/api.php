@@ -15,6 +15,7 @@ Route::get('/domains', [DomainController::class, 'index']);
 Route::get('/domains/{id}', [DomainController::class, 'show']);
 Route::get('/komentar', [DomainController::class, 'komentarAll']);
 Route::post('/komentar', [DomainController::class, 'komentar']);
+Route::get('/tamu/{id}/{slug}', [DomainController::class, 'tamu']);
 Route::put('/tema', [TemaController::class, 'edit']);
 
 Route::get('/testimonials', [DemoController::class, 'testimonials']);

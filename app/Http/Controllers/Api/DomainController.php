@@ -79,6 +79,7 @@ class DomainController extends Controller
 
             return response()->json([
                 'message' => $komentar->isEmpty() ? 'Tidak ada komentar untuk user ini' : 'List komentar',
+                'total' => $komentar->count(),
                 'data' => $komentar,
             ]);
         } catch (\Exception $e) {
@@ -87,5 +88,21 @@ class DomainController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function tamu(Request $request, $id, $slug)
+    {
+        $tamu = Tamu::where('nama_slug', $slug)->where('id_user', $id)->first();
+
+        if (!$tamu) {
+            return response()->json([
+                'message' => 'Tamu not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Tamu details',
+            'data' => $tamu,
+        ]);
     }
 }
