@@ -31,12 +31,12 @@ class DomainController extends Controller
             'user.rules',
         )->where('domain', $id)->first();
 
-        $tamu = Tamu::where('nama_slug', $request->slig)->where('id_user', $domain->user->id)->first();
+        $tamu = Tamu::where('nama_slug', $request->slug)->where('id_user', $domain->id_user)->first();
 
         if (!$domain) {
             return response()->json([
                 'message' => 'Domain not found',
-            ], 404);
+            ], 404); 
         }
         return response()->json([
             'message' => 'Domain details',
