@@ -175,9 +175,30 @@ class TemaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Tema $tema)
+    public function update(Request $request, int $id)
     {
-        //
+        $tema = Tema::find($id);
+
+        if (!$tema) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Tema tidak ditemukan',
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:200',
+            'code' => 'sometimes|string|max:200|unique:temas,code,' . $tema->id,
+        ]);
+
+        $tema->fill($validated);
+        $tema->save();
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Tema berhasil diupdate',
+            'data'    => $tema,
+        ]);
     }
 
     /**

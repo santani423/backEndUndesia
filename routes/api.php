@@ -18,6 +18,7 @@ Route::get('/komentar', [DomainController::class, 'komentarAll']);
 Route::post('/komentar', [DomainController::class, 'komentar']);
 Route::get('/tamu/{id}/{slug}', [DomainController::class, 'tamu']);
 Route::put('/tema', [TemaController::class, 'edit']);
+Route::put('/tema/{id}', [TemaController::class, 'update']);
 
 Route::get('/testimonials', [DemoController::class, 'testimonials']);
 Route::get('/themes', [DemoController::class, 'themes']);

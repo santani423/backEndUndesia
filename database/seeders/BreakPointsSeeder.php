@@ -13,6 +13,7 @@ class BreakPointsSeeder extends Seeder
         DB::table('breack_poins')->truncate();
 
         $breakpoints = [
+            ['name' => 'default', 'code' => 'default', 'sekala' => '0px'],
             ['name' => 'xxxs',   'code' => 'xxxs',   'sekala' => '340px'],
             ['name' => 'xxs',    'code' => 'xxs',    'sekala' => '360px'], // Samsung Galaxy S20
             ['name' => 'xs',     'code' => 'xs',     'sekala' => '375px'], // iPhone SE
