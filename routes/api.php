@@ -11,6 +11,7 @@ Route::get('/demo', [DemoController::class, 'index']);
 Route::get('/size', [SizeTemaController::class, 'index']);
 Route::get('/brackPoin', [SizeTemaController::class, 'brackPoin']);
 Route::get('/tema', [TemaController::class, 'index']);
+Route::get('/tema/{id}', [TemaController::class, 'show']);
 Route::get('/domains', [DomainController::class, 'index']);
 Route::get('/domains/{id}', [DomainController::class, 'show']);
 Route::get('/komentar', [DomainController::class, 'komentarAll']);

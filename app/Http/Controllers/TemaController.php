@@ -50,9 +50,17 @@ class TemaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Tema $tema)
+    public function show($tema)
     {
-        //
+        $query = Tema::with([
+            'assets.assetSizes.breakpoint',
+            'assets.assetSizes.sizeTema'
+        ])->where('code', $tema)->get();
+
+        return response()->json([
+            'message' => 'List of themes',
+            'data' => $query,
+        ]);
     }
 
     /**
@@ -60,14 +68,14 @@ class TemaController extends Controller
      */
     public function edit(Request $request)
     {
-         
+
         $validated = $request->validate([
             'asset_id'   => 'required|integer',
             'breakpoint' => 'required|string',
             'plesMinus'  => 'required|in:+,-',
         ]);
 
-         
+
 
         // Ambil breakpoint
         $breakpoint = BreackPoin::where('code', $validated['breakpoint'])->first();
@@ -92,7 +100,7 @@ class TemaController extends Controller
                 'message' => 'Asset size tidak ditemukan',
             ], 404);
         }
- 
+
 
         // Ambil size sekarang
         $size = SizeTema::find($assetSize->size_tema_id);
