@@ -120,18 +120,26 @@ class TemaController extends Controller
         $assetSize = AssetSize::where('asset_id', $validated['asset_id'])
             // ->where('type', $validated['type'])
             ->where('breack_poin_id', $breakpoint->id)
-            ->first();
+            ->get();
 
-        if (!$assetSize) {
+        if ($assetSize->isEmpty()) {
             return response()->json([
                 'status' => false,
                 'message' => 'Asset size tidak ditemukan',
             ], 404);
         }
 
-
+        $size = null;
         // Ambil size sekarang
-        $size = SizeTema::find($assetSize->size_tema_id);
+        foreach ($assetSize as $assetSizeItem) {
+            $size = SizeTema::find($assetSizeItem->size_tema_id);
+            if ($size && $size->type === $validated['type']) {
+                $assetSize = $assetSizeItem;
+                break;
+            }
+            
+        }
+         
         if (!$size) {
             return response()->json([
                 'status' => false,
