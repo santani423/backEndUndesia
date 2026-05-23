@@ -118,7 +118,7 @@ class TemaController extends Controller
         // ]);
         // Ambil asset size
         $assetSize = AssetSize::where('asset_id', $validated['asset_id'])
-            ->where('type', $validated['type'])
+            // ->where('type', $validated['type'])
             ->where('breack_poin_id', $breakpoint->id)
             ->first();
 
@@ -179,42 +179,27 @@ class TemaController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        $validated = $request->validate([
-            'plesMinus' => 'required|in:+,-',
-        ]);
+        $tema = Tema::find($id);
 
-        $assetSize = AssetSize::find($id);
-        $size      = $assetSize ? SizeTema::find($assetSize->size_tema_id) : null;
-
-        if (!$assetSize || !$size) {
+        if (!$tema) {
             return response()->json([
                 'status'  => false,
-                'message' => !$assetSize ? 'Asset size tidak ditemukan' : 'Size tema tidak ditemukan',
+                'message' => 'Tema tidak ditemukan',
             ], 404);
         }
 
-        $updateNo = $validated['plesMinus'] === '+' ? $size->no + 1 : $size->no - 1;
-        $size2    = SizeTema::where('no', $updateNo)->where('type', $size->type)->first();
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:200',
+            'code' => 'sometimes|string|max:200|unique:temas,code,' . $tema->id,
+        ]);
 
-        if (!$size2) {
-            return response()->json([
-                'status'   => false,
-                'message'  => 'Size tujuan tidak tersedia',
-                'updateNo' => $updateNo,
-            ], 400);
-        }
-
-        $assetSize->size_tema_id = $size2->id;
-        $assetSize->save();
+        $tema->fill($validated);
+        $tema->save();
 
         return response()->json([
             'status'  => true,
-            'message' => 'Size berhasil diupdate',
-            'data'    => [
-                'asset_size_id' => $id,
-                'old_size'      => $size,
-                'new_size'      => $size2,
-            ],
+            'message' => 'Tema berhasil diupdate',
+            'data'    => $tema,
         ]);
     }
 
