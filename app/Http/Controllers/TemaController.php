@@ -52,14 +52,40 @@ class TemaController extends Controller
      */
     public function show($tema)
     {
-        $query = Tema::with([
+        $tema = Tema::with([
             'assets.assetSizes.breakpoint',
             'assets.assetSizes.sizeTema'
-        ])->where('code', $tema)->get();
+        ])->where('code', $tema)->first();
+
+        if (!$tema) {
+            return response()->json([
+                'message' => 'Tema tidak ditemukan',
+            ], 404);
+        }
+
+        $assets = $tema->assets->map(function ($asset) {
+            return [
+                'id'     => $asset->id,
+                'name'   => $asset->name,
+                'src'    => $asset->src,
+                'xMedia' => $asset->assetSizes->map(function ($assetSize) {
+                    return [
+                        'device' => $assetSize->breakpoint?->code,
+                        'py'     => $assetSize->py,
+                        'size'   => $assetSize->sizeTema?->value,
+                    ];
+                })->values(),
+            ];
+        })->values();
 
         return response()->json([
-            'message' => 'List of themes',
-            'data' => $query,
+            'message' => 'Detail tema',
+            'data'    => [
+                'id'     => $tema->id,
+                'code'   => $tema->code,
+                'name'   => $tema->name,
+                'assets' => $assets,
+            ],
         ]);
     }
 
