@@ -99,6 +99,7 @@ class TemaController extends Controller
             'asset_id'   => 'required|integer',
             'breakpoint' => 'required|string',
             'plesMinus'  => 'required|in:+,-',
+            'type'       => 'required|string|in:top,bottom,right,left,w',
         ]);
 
 
@@ -117,6 +118,7 @@ class TemaController extends Controller
         // ]);
         // Ambil asset size
         $assetSize = AssetSize::where('asset_id', $validated['asset_id'])
+            ->where('type', $validated['type'])
             ->where('breack_poin_id', $breakpoint->id)
             ->first();
 
