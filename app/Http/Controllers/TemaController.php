@@ -130,12 +130,17 @@ class TemaController extends Controller
         }
 
         $size = null;
+         return response()->json([
+                'status' => false,
+                'message' => $assetSize,
+            ], 200);
         // Ambil size sekarang
         foreach ($assetSize as $assetSizeItem) {
             $size = SizeTema::find($assetSizeItem->size_tema_id);
             if ($size && $size->type === $validated['type']) {
                 $assetSize = $assetSizeItem;
                 break;
+
             }
             
         }
