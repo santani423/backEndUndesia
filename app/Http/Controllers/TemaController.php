@@ -179,27 +179,42 @@ class TemaController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        $tema = Tema::find($id);
+        $validated = $request->validate([
+            'plesMinus' => 'required|in:+,-',
+        ]);
 
-        if (!$tema) {
+        $assetSize = AssetSize::find($id);
+        $size      = $assetSize ? SizeTema::find($assetSize->size_tema_id) : null;
+
+        if (!$assetSize || !$size) {
             return response()->json([
                 'status'  => false,
-                'message' => 'Tema tidak ditemukan',
+                'message' => !$assetSize ? 'Asset size tidak ditemukan' : 'Size tema tidak ditemukan',
             ], 404);
         }
 
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:200',
-            'code' => 'sometimes|string|max:200|unique:temas,code,' . $tema->id,
-        ]);
+        $updateNo = $validated['plesMinus'] === '+' ? $size->no + 1 : $size->no - 1;
+        $size2    = SizeTema::where('no', $updateNo)->where('type', $size->type)->first();
 
-        $tema->fill($validated);
-        $tema->save();
+        if (!$size2) {
+            return response()->json([
+                'status'   => false,
+                'message'  => 'Size tujuan tidak tersedia',
+                'updateNo' => $updateNo,
+            ], 400);
+        }
+
+        $assetSize->size_tema_id = $size2->id;
+        $assetSize->save();
 
         return response()->json([
             'status'  => true,
-            'message' => 'Tema berhasil diupdate',
-            'data'    => $tema,
+            'message' => 'Size berhasil diupdate',
+            'data'    => [
+                'asset_size_id' => $id,
+                'old_size'      => $size,
+                'new_size'      => $size2,
+            ],
         ]);
     }
 
