@@ -211,7 +211,7 @@ class SizeTemaSeeder extends Seeder
                     ];
                 }
             }else {
-                foreach ($rawValues as $key => $item) {
+                foreach ($rawNegativeValues as $key => $item) {
                     $data[] = [
                         'type'  => $type,
                          'no'    => $key + 1, // Start from 1 for positive values
