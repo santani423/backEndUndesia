@@ -215,7 +215,7 @@ class SizeTemaSeeder extends Seeder
                 foreach ($rawValues as $key => $item) {
                     $data[] = [
                         'type'  => $type,
-                        'no'    => $key + 1, // Start from 1 for positive values
+                        'no'    =>3, // Start from 1 for positive values
                         'value' => $type . '-' . $item,
                     ];
                 }
