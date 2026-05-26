@@ -35,7 +35,7 @@ class Tema1Seeder extends Seeder
 
     private function insertAssets(int $temaId): void
     {
-        $names = ['clothesRack', 'addres', 'rsvp', 'couple', 'loveStory', 'gift', 'gallery'];
+        $names = ['clothes-rack', 'address', 'rsvp', 'couple', 'love-story.', 'gift', 'gallery'];
 
         foreach ($names as $name) {
             DB::table('assets')->insert([
@@ -103,7 +103,7 @@ class Tema1Seeder extends Seeder
     private function componentStyles(): array
     {
         return [
-            'clothesRack' => [
+            'clothes-rack' => [
                 'default' => ['top' => 68, 'right' => 1,  'w' => 32],
                 'xxs'     => ['top' => 46],
                 'xs'      => ['top' => 30, 'w' => 38],
@@ -123,7 +123,7 @@ class Tema1Seeder extends Seeder
                 '3xl'     => ['top' => 58, 'w' => 40],
                 '5xl'     => ['top' => 82, 'w' => 50],
             ],
-            'addres' => [
+            'address' => [
                 'default' => ['top' => 0,  'right' => 7, 'w' => 26],
                 'sm'      => ['w' => 32],
                 'md'      => ['w' => 36],
