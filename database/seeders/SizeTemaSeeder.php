@@ -197,8 +197,7 @@ class SizeTemaSeeder extends Seeder
             "396",
             "400",
         ];
-        $negativeValues = array_map(fn($i, $v) => ['no' => $i, 'value' => $v], array_keys($rawNegativeValues), $rawNegativeValues);
-
+       
         $data = [];
 
         foreach ($types as $type) {
@@ -212,13 +211,13 @@ class SizeTemaSeeder extends Seeder
                     ];
                 }
             }else {
-                foreach ($rawValues as $key => $item) {
-                    $data[] = [
-                        'type'  => $type,
-                        'no'    =>3, // Start from 1 for positive values
-                        'value' => $type . '-' . $item,
-                    ];
-                }
+                // foreach ($rawValues as $key => $item) {
+                //     $data[] = [
+                //         'type'  => $type,
+                //         'no'    =>3, // Start from 1 for positive values
+                //         'value' => $type . '-' . $item,
+                //     ];
+                // }
             }
             
         }
