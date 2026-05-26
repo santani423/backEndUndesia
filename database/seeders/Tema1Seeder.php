@@ -40,7 +40,7 @@ class Tema1Seeder extends Seeder
         foreach ($names as $name) {
             DB::table('assets')->insert([
                 'tema_id'    => $temaId,
-                'path'       => $name . '.png',
+                'path'       => $name . '.webp',
                 'name'       => $name,
                 'type'       => 'item',
                 'created_at' => now(),
