@@ -12,18 +12,18 @@ class SizeTemaSeeder extends Seeder
         $types = ['top', 'bottom', 'right', 'left', 'w'];
 
         // Tailwind CSS complete spacing/sizing scale
-        $values = [
+        $rawValues = [
             "px","0","0.5","1","1.5","2","2.5","3","3.5","4","5","6","7","8","9","10",
             "11","12","14","16","20","24","28","32","36","40","44","48","52","56","60",
             "64","72","80","96",
-            // Fractions (width/height)
             "1/2","1/3","2/3","1/4","2/4","3/4","1/5","2/5","3/5","4/5",
             "1/6","2/6","3/6","4/6","5/6","1/12","2/12","3/12","4/12","5/12",
             "6/12","7/12","8/12","9/12","10/12","11/12",
             "full","screen","svh","lvh","dvh","min","max","fit",
         ];
+        $values = array_map(fn($i, $v) => ['no' => $i, 'value' => $v], array_keys($rawValues), $rawValues);
 
-        $negativeValues = [
+        $rawNegativeValues = [
             "px","0.5","1","1.5","2","2.5","3","3.5","4","5","6","7","8","9","10",
             "11","12","14","16","20","24","28","32","36","40","44","48","52","56",
             "60","64","72","80","96",
@@ -35,25 +35,26 @@ class SizeTemaSeeder extends Seeder
             "340","344","348","352","356","360","364","368","372","376","380","384",
             "388","392","396","400",
         ];
+        $negativeValues = array_map(fn($i, $v) => ['no' => $i, 'value' => $v], array_keys($rawNegativeValues), $rawNegativeValues);
 
         $data = [];
 
         foreach ($types as $type) {
            
             if (in_array($type, ['top', 'bottom', 'right', 'left'])) {
-                foreach ($negativeValues as $index => $value) {
+                foreach ($negativeValues as $item) {
                     $data[] = [
                         'type'  => $type,
-                        'no'    => ($index + 1),
-                        'value' => '-' . $type . '-' . $value,
+                        'no'    => $item['no'],
+                        'value' => '-' . $type . '-' . $item['value'],
                     ];
                 }
-            }else {
-                foreach ($values as $index => $value) {
+            } else {
+                foreach ($values as $item) {
                     $data[] = [
                         'type'  => $type,
-                        'no'    => $index,
-                        'value' => $type . '-' . $value,
+                        'no'    => $item['no'],
+                        'value' => $type . '-' . $item['value'],
                     ];
                 }
             }
