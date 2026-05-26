@@ -44,7 +44,7 @@ class SizeTemaSeeder extends Seeder
                 foreach ($negativeValues as $index => $value) {
                     $data[] = [
                         'type'  => $type,
-                        'no'    => -($index + 1),
+                        'no'    => ($index + 1),
                         'value' => '-' . $type . '-' . $value,
                     ];
                 }
