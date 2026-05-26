@@ -211,13 +211,13 @@ class SizeTemaSeeder extends Seeder
                     ];
                 }
             }else {
-                // foreach ($rawValues as $key => $item) {
-                //     $data[] = [
-                //         'type'  => $type,
-                //         'no'    =>3, // Start from 1 for positive values
-                //         'value' => $type . '-' . $item,
-                //     ];
-                // }
+                foreach ($rawValues as $key => $item) {
+                    $data[] = [
+                        'type'  => $type,
+                         'no'    => $key + 1, // Start from 1 for positive values
+                        'value' => $type . '-' . $item,
+                    ];
+                }
             }
             
         }
@@ -225,6 +225,6 @@ class SizeTemaSeeder extends Seeder
         
 
         DB::table('size_temas')->truncate();
-        // DB::table('size_temas')->insert($data);
+        DB::table('size_temas')->insert($data);
     }
 }
