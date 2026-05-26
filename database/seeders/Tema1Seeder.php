@@ -35,7 +35,7 @@ class Tema1Seeder extends Seeder
 
     private function insertAssets(int $temaId): void
     {
-        $names = ['clothes-rack', 'address', 'rsvp', 'couple', 'love-story.', 'gift', 'gallery'];
+        $names = ['clothes-rack', 'address', 'rsvp', 'couple', 'love-story', 'gift', 'gallery'];
 
         foreach ($names as $name) {
             DB::table('assets')->insert([
