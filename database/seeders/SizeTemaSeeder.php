@@ -39,19 +39,21 @@ class SizeTemaSeeder extends Seeder
         $data = [];
 
         foreach ($types as $type) {
-            foreach ($values as $index => $value) {
-                $data[] = [
-                    'type'  => $type,
-                    'no'    => $index + 1,
-                    'value' => $type . '-' . $value,
-                ];
-            }
+           
             if (in_array($type, ['top', 'bottom', 'right', 'left'])) {
                 foreach ($negativeValues as $index => $value) {
                     $data[] = [
                         'type'  => $type,
                         'no'    => -($index + 1),
                         'value' => '-' . $type . '-' . $value,
+                    ];
+                }
+            }else {
+                foreach ($values as $index => $value) {
+                    $data[] = [
+                        'type'  => $type,
+                        'no'    => $index,
+                        'value' => $type . '-' . $value,
                     ];
                 }
             }
