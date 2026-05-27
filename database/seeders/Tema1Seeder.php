@@ -209,7 +209,7 @@ class Tema1Seeder extends Seeder
                 '4xl'     => ['top' => 100, 'bottom' => 0,  'right' => 48, 'w' => 42],
                 '5xl'     => ['top' => 118, 'bottom' => 0,  'right' => 46, 'w' => 50],
             ],
-            'loveStory' => [
+            'love-story' => [
                 'default' => ['top' => 0, 'bottom' => 80,  'right' => -8, 'w' => 40],
                 'xxxs'    => ['top' => 0, 'bottom' => 56,  'right' => -4, 'w' => 32],
                 'xxs'     => ['top' => 0, 'bottom' => 64,  'right' => -4, 'w' => 36],
