@@ -356,13 +356,25 @@ async function addAsset(data = null) {
     `;
     list.appendChild(div);
 
-    // Jika ada data existing, populate dari xMedia; jika tidak, generate otomatis semua kombinasi
-    const xMedia = data?.xMedia ?? data?.asset_sizes ?? [];
-    if (xMedia.length) {
-        await buildSizeGrid(idx, xMedia);
-    } else {
-        await buildSizeGrid(idx, []);
+    // Normalise ke format { device, size_tema_id } yang dimengerti buildSizeGrid
+    let xMedia = [];
+    if (data?.xMedia?.length) {
+        // Format dari endpoint show: { device, size, py }
+        xMedia = data.xMedia;
+    } else if (data?.asset_sizes?.length) {
+        // Format relasi langsung: { breack_poin_id, size_tema_id, breakpoint:{code}, size_tema:{...} }
+        xMedia = data.asset_sizes.map(s => ({
+            device:      s.breakpoint?.code ?? '',
+            size_tema_id: s.size_tema_id,
+        }));
+    } else if (data?.assetSizes?.length) {
+        // Format dari endpoint index dengan eager load
+        xMedia = data.assetSizes.map(s => ({
+            device:      s.breakpoint?.code ?? '',
+            size_tema_id: s.size_tema_id,
+        }));
     }
+    await buildSizeGrid(idx, xMedia);
 }
 
 function removeAsset(idx) {
