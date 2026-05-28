@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Rsvp;
 use App\Models\Tamu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class DomainController extends Controller
 {
@@ -109,16 +110,20 @@ class DomainController extends Controller
 
     public function rsvpAdd(Request $request)
     {
-        return response()->json([
-                'message' => 'RSVP berhasil ditambahkan', 
-            ], 200);
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'id_user' => 'required|integer',
             'slug' => 'nullable|string|max:255',
             'nama' => 'required|string|max:255',
             'kehadiran' => 'required|in:Hadir,Tidak Hadir',
             'massage' => 'required|string|max:255',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
 
         try {
             $tamu = null;
