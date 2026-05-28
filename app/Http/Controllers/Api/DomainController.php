@@ -32,12 +32,9 @@ class DomainController extends Controller
             'user.rekening',
             'user.rules',
         )->where('domain', $id)->first();
-     return response()->json([
-            'message' => 'Domain details',
-            'data' => $domain,
-            'tamu' => $request->all(),
-        ]);
-        $tamu = Tamu::with('rsvp')->where('nama_slug', $request->slug)->where('id_user', $domain->id_user)->first();
+  
+        $slug = $request->query('slug');
+        $tamu = Tamu::with('rsvp')->where('nama_slug', $slug)->where('id_user', $domain->id_user)->first();
             
         if (!$domain) {
             return response()->json([
