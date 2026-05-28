@@ -7,5 +7,5 @@ Route::get('/', function () {
 });
 
 Route::get('/tema', function () {
-    // return view('tema.index');
+    return view('tema.index');
 });
