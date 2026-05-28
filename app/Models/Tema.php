@@ -12,4 +12,8 @@ class Tema extends Model
     {
           return $this->hasMany(Asset::class, 'tema_id', 'id');
     }
+    public function themeColors()
+    {
+          return $this->hasMany(ThemeColor::class, 'tema_id', 'id');
+    }
 }
