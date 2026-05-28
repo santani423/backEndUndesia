@@ -154,11 +154,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const API = '/api';
-let breakpoints = [];
-let sizeTemas   = [];
-let deleteCode  = null;
-let assetIdx    = 0;
-let colorIdx    = 0;
+let breakpoints  = [];
+let sizeTemas    = [];
+let deleteCode   = null;
+let assetIdx     = 0;
+let colorIdx     = 0;
 let sizeCounters = {};
 
 // ── Init ───────────────────────────────────────────────────────────────────────
@@ -170,17 +170,48 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadBreakpoints() {
     try {
         const r = await fetch(`${API}/brackPoin`);
+        if (!r.ok) return;
         const d = await r.json();
-        breakpoints = d.data ?? d ?? [];
-    } catch {}
+        const raw = d.data ?? d;
+        breakpoints = Array.isArray(raw) ? raw : [];
+    } catch (e) {
+        console.error('Gagal load breakpoints:', e);
+    }
 }
 
 async function loadSizeTemas() {
     try {
         const r = await fetch(`${API}/size`);
         const d = await r.json();
-        sizeTemas = d.data ?? d ?? [];
-    } catch {}
+        const raw = d.data ?? d;
+        sizeTemas = Array.isArray(raw) ? raw : [];
+    } catch (e) {
+        console.error('Gagal load size temas:', e);
+    }
+}
+
+// Populate semua select breakpoint yang ada di DOM
+function refreshBreakpointSelects() {
+    document.querySelectorAll('.size-bp').forEach(sel => {
+        const current = sel.value;
+        sel.innerHTML = '<option value="">-- pilih breakpoint --</option>'
+            + breakpoints.map(b =>
+                `<option value="${b.code}" ${current === b.code ? 'selected' : ''}>${b.code}${b.name ? ' — ' + b.name : ''}${b.sekala ? ' ('+b.sekala+')' : ''}</option>`
+            ).join('');
+        if (current) sel.value = current;
+    });
+}
+
+// Populate semua select size tema yang ada di DOM
+function refreshSizeTemaSelects() {
+    document.querySelectorAll('.size-st').forEach(sel => {
+        const current = sel.value;
+        sel.innerHTML = '<option value="">-- pilih size --</option>'
+            + sizeTemas.map(s =>
+                `<option value="${s.id}" ${current == s.id ? 'selected' : ''}>${s.type} — ${s.value}</option>`
+            ).join('');
+        if (current) sel.value = current;
+    });
 }
 
 async function loadTemas() {
@@ -222,7 +253,11 @@ async function loadTemas() {
 }
 
 // ── Modal Buat / Edit ──────────────────────────────────────────────────────────
-function openCreateModal() {
+async function openCreateModal() {
+    // Preload master data agar dropdown siap saat user klik "Tambah Ukuran"
+    if (!breakpoints.length) await loadBreakpoints();
+    if (!sizeTemas.length)   await loadSizeTemas();
+
     document.getElementById('modalTitle').textContent = 'Tambah Tema';
     document.getElementById('btnText').textContent    = 'Simpan';
     document.getElementById('editCode').value  = '';
@@ -235,7 +270,7 @@ function openCreateModal() {
     new bootstrap.Modal(document.getElementById('temaModal')).show();
 }
 
-function openEditModal(tema) {
+async function openEditModal(tema) {
     document.getElementById('modalTitle').textContent = 'Edit Tema';
     document.getElementById('btnText').textContent    = 'Update';
     document.getElementById('editCode').value  = tema.code;
@@ -246,27 +281,36 @@ function openEditModal(tema) {
     assetIdx = 0; colorIdx = 0; sizeCounters = {};
     const assetList = document.getElementById('assetList');
     const colorList = document.getElementById('colorList');
-    assetList.innerHTML = '';
+    assetList.innerHTML = '<p class="text-muted small">Memuat aset…</p>';
     colorList.innerHTML = '';
 
-    (tema.assets ?? []).forEach(asset => addAsset(asset));
+    // Pastikan master data tersedia sebelum render
+    if (!breakpoints.length) await loadBreakpoints();
+    if (!sizeTemas.length)   await loadSizeTemas();
+
+    assetList.innerHTML = '';
+    for (const asset of (tema.assets ?? [])) {
+        await addAsset(asset);
+    }
     (tema.theme_colors ?? []).forEach(color => addColor(color));
 
-    if (!assetList.children.length)
+    if (!assetList.querySelector('.asset-row'))
         assetList.innerHTML = '<p class="text-muted small mb-0">Belum ada aset. Klik "Tambah Aset".</p>';
-    if (!colorList.children.length)
+    if (!colorList.querySelector('.color-row'))
         colorList.innerHTML = '<p class="text-muted small mb-0">Belum ada warna. Klik "Tambah Warna".</p>';
 
     new bootstrap.Modal(document.getElementById('temaModal')).show();
 }
 
 // ── Asset ──────────────────────────────────────────────────────────────────────
-function addAsset(data = null) {
+async function addAsset(data = null) {
+    if (!breakpoints.length) await loadBreakpoints();
+    if (!sizeTemas.length)   await loadSizeTemas();
+
     const idx = assetIdx++;
     sizeCounters[idx] = 0;
     const list = document.getElementById('assetList');
-    const ph   = list.querySelector('p.text-muted');
-    if (ph) ph.remove();
+    list.querySelector('p.text-muted')?.remove();
 
     const div = document.createElement('div');
     div.className = 'asset-row';
@@ -295,7 +339,8 @@ function addAsset(data = null) {
         </div>
         <div class="d-flex align-items-center justify-content-between mb-1">
             <span class="section-title">Ukuran (asset_sizes)</span>
-            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="addSize(${idx})" style="font-size:.72rem">
+            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
+                onclick="addSize(${idx})" style="font-size:.72rem">
                 <i class="bi bi-plus"></i> Ukuran
             </button>
         </div>
@@ -304,7 +349,9 @@ function addAsset(data = null) {
     list.appendChild(div);
 
     const xMedia = data?.xMedia ?? data?.asset_sizes ?? [];
-    xMedia.forEach(s => addSize(idx, s));
+    for (const s of xMedia) {
+        await addSize(idx, s);
+    }
 }
 
 function removeAsset(idx) {
@@ -321,37 +368,50 @@ function checkEmptyAssets() {
 }
 
 // ── Sizes ─────────────────────────────────────────────────────────────────────
-function addSize(assetIdx, data = null) {
-    const sIdx   = sizeCounters[assetIdx] ?? 0;
+async function addSize(assetIdx, data = null) {
+    // Pastikan data master sudah terload sebelum render
+    if (!breakpoints.length) await loadBreakpoints();
+    if (!sizeTemas.length)   await loadSizeTemas();
+
+    const sIdx = sizeCounters[assetIdx] ?? 0;
     sizeCounters[assetIdx] = sIdx + 1;
     const listEl = document.getElementById(`size-list-${assetIdx}`);
     if (!listEl) return;
 
-    const bpOpts = breakpoints.map(b =>
-        `<option value="${b.code}" ${data?.device === b.code ? 'selected' : ''}>${b.code}</option>`
-    ).join('');
-
-    const stOpts = sizeTemas.map(s =>
-        `<option value="${s.id}" ${(data?.size_tema_id === s.id || data?.size === s.value) ? 'selected' : ''}>${s.type} - ${s.value}</option>`
-    ).join('');
+    // Cari size_tema_id dari value string jika tidak ada id langsung
+    let selectedSizeId = data?.size_tema_id ?? '';
+    if (!selectedSizeId && data?.size) {
+        const match = sizeTemas.find(s => s.value === data.size);
+        if (match) selectedSizeId = match.id;
+    }
 
     const div = document.createElement('div');
     div.className = 'size-row d-flex gap-2 align-items-end';
     div.id = `size-${assetIdx}-${sIdx}`;
     div.innerHTML = `
-        <div style="flex:1">
-            <label class="form-label small">Breakpoint</label>
+        <div style="flex:1.2">
+            <label class="form-label small mb-1">Breakpoint</label>
             <select class="form-select form-select-sm size-bp">
-                <option value="">-- pilih --</option>${bpOpts}
+                <option value="">-- pilih breakpoint --</option>
+                ${breakpoints.map(b =>
+                    `<option value="${b.code}" ${data?.device === b.code ? 'selected' : ''}>
+                        ${b.code}${b.name ? ' — ' + b.name : ''}${b.sekala ? ' (' + b.sekala + ')' : ''}
+                    </option>`
+                ).join('')}
             </select>
         </div>
         <div style="flex:2">
-            <label class="form-label small">Size Tema</label>
+            <label class="form-label small mb-1">Size Tema</label>
             <select class="form-select form-select-sm size-st">
-                <option value="">-- pilih --</option>${stOpts}
+                <option value="">-- pilih size --</option>
+                ${sizeTemas.map(s =>
+                    `<option value="${s.id}" ${selectedSizeId == s.id ? 'selected' : ''}>
+                        ${s.type} — ${s.value}
+                    </option>`
+                ).join('')}
             </select>
         </div>
-        <button type="button" class="btn btn-outline-danger btn-remove mb-0" onclick="removeSize('${assetIdx}-${sIdx}')">
+        <button type="button" class="btn btn-outline-danger btn-remove align-self-end" onclick="removeSize('${assetIdx}-${sIdx}')">
             <i class="bi bi-x"></i>
         </button>
     `;
