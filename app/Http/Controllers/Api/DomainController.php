@@ -139,11 +139,23 @@ class DomainController extends Controller
                     ]);
                 }
             }
+            if ($tamu) {
+                $rsvp = Rsvp::where('tamu_id', $tamu->id_tamu)->first();
 
-            $rsvp = Rsvp::create([
-                'tamu_id' => $tamu ? $tamu->id_tamu : null,
-                'massage' => $request->massage,
-            ]);
+                if ($rsvp) {
+                    $rsvp->update(['massage' => $request->massage]);
+                } else {
+                    $rsvp = Rsvp::create([
+                        'tamu_id' => $tamu->id_tamu,
+                        'massage' => $request->massage,
+                    ]);
+                }
+            } else {
+                $rsvp = Rsvp::create([
+                    'tamu_id' => null,
+                    'massage' => $request->massage,
+                ]);
+            }
 
             return response()->json([
                 'message' => 'RSVP berhasil ditambahkan',
