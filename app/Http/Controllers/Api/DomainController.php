@@ -105,4 +105,35 @@ class DomainController extends Controller
             'data' => $tamu,
         ]);
     }
+
+    public function rsvpAdd(Request $request)
+    {
+        $request->validate([ 
+            'slug' => 'string|max:255',
+            'nama' => 'required|string|max:255', 
+            'kehadiran' => 'required|in:Hadir,Tidak Hadir',
+            'massage' => 'required|string|max:255', 
+        ]);
+
+        try {
+
+            $tamu = Tamu::where('nama_slug', $request->slug)->first();
+
+            if ($tamu) {
+               $tamu->update([ 
+                    'kehadiran' => $request->kehadiran, 
+                ]);
+            }
+
+            return response()->json([
+                'message' => 'RSVP berhasil ditambahkan',
+                'data' => $tamu,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal menambahkan RSVP',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
