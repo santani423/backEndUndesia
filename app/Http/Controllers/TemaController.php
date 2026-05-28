@@ -7,7 +7,9 @@ use App\Models\AssetSize;
 use App\Models\BreackPoin;
 use App\Models\SizeTema;
 use App\Models\Tema;
+use App\Models\ThemeColor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TemaController extends Controller
 {
@@ -44,7 +46,196 @@ class TemaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name'                              => 'required|string|max:200',
+            'code'                              => 'required|string|max:200|unique:temas,code',
+            'assets'                            => 'nullable|array',
+            'assets.*.name'                     => 'required_with:assets|string',
+            'assets.*.path'                     => 'required_with:assets|string',
+            'assets.*.type'                     => 'nullable|string',
+            'assets.*.sizes'                    => 'nullable|array',
+            'assets.*.sizes.*.breakpoint_code'  => 'required_with:assets.*.sizes|string|exists:breack_poins,code',
+            'assets.*.sizes.*.size_tema_id'     => 'required_with:assets.*.sizes|integer|exists:size_temas,id',
+            'theme_colors'                      => 'nullable|array',
+            'theme_colors.*.key'                => 'required_with:theme_colors|string',
+            'theme_colors.*.value'              => 'required_with:theme_colors|string|max:50',
+            'theme_colors.*.label'              => 'nullable|string',
+            'theme_colors.*.group'              => 'nullable|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $tema = Tema::create([
+                'name' => $validated['name'],
+                'code' => $validated['code'],
+            ]);
+
+            foreach ($validated['assets'] ?? [] as $assetData) {
+                $asset = Asset::create([
+                    'tema_id' => $tema->id,
+                    'name'    => $assetData['name'],
+                    'path'    => $assetData['path'],
+                    'type'    => $assetData['type'] ?? null,
+                ]);
+
+                foreach ($assetData['sizes'] ?? [] as $sizeData) {
+                    $breakpoint = BreackPoin::where('code', $sizeData['breakpoint_code'])->first();
+                    AssetSize::create([
+                        'asset_id'      => $asset->id,
+                        'breack_poin_id' => $breakpoint->id,
+                        'size_tema_id'  => $sizeData['size_tema_id'],
+                    ]);
+                }
+            }
+
+            foreach ($validated['theme_colors'] ?? [] as $colorData) {
+                ThemeColor::create([
+                    'tema_id' => $tema->id,
+                    'key'     => $colorData['key'],
+                    'value'   => $colorData['value'],
+                    'label'   => $colorData['label'] ?? null,
+                    'group'   => $colorData['group'] ?? null,
+                ]);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => false,
+                'message' => 'Gagal membuat tema: ' . $e->getMessage(),
+            ], 500);
+        }
+
+        $tema->load(['assets.assetSizes.breakpoint', 'assets.assetSizes.sizeTema', 'themeColors']);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Tema berhasil dibuat',
+            'data'    => $tema,
+        ], 201);
+    }
+
+    /**
+     * Update seluruh data tema beserta assets, asset_sizes, dan theme_colors.
+     */
+    public function updateByCode(Request $request, string $code)
+    {
+        $tema = Tema::where('code', $code)->first();
+
+        if (!$tema) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Tema tidak ditemukan',
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'name'                              => 'sometimes|string|max:200',
+            'code'                              => 'sometimes|string|max:200|unique:temas,code,' . $tema->id,
+            'assets'                            => 'nullable|array',
+            'assets.*.id'                       => 'nullable|integer|exists:assets,id',
+            'assets.*.name'                     => 'required_with:assets|string',
+            'assets.*.path'                     => 'required_with:assets|string',
+            'assets.*.type'                     => 'nullable|string',
+            'assets.*.sizes'                    => 'nullable|array',
+            'assets.*.sizes.*.breakpoint_code'  => 'required_with:assets.*.sizes|string|exists:breack_poins,code',
+            'assets.*.sizes.*.size_tema_id'     => 'required_with:assets.*.sizes|integer|exists:size_temas,id',
+            'theme_colors'                      => 'nullable|array',
+            'theme_colors.*.id'                 => 'nullable|integer|exists:theme_colors,id',
+            'theme_colors.*.key'                => 'required_with:theme_colors|string',
+            'theme_colors.*.value'              => 'required_with:theme_colors|string|max:50',
+            'theme_colors.*.label'              => 'nullable|string',
+            'theme_colors.*.group'              => 'nullable|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $tema->fill(array_filter([
+                'name' => $validated['name'] ?? null,
+                'code' => $validated['code'] ?? null,
+            ], fn($v) => $v !== null));
+            $tema->save();
+
+            if (array_key_exists('assets', $validated)) {
+                $incomingAssetIds = collect($validated['assets'])->pluck('id')->filter()->values()->all();
+                // Hapus asset yang tidak ada di request
+                $tema->assets()->whereNotIn('id', $incomingAssetIds)->each(function ($asset) {
+                    $asset->assetSizes()->delete();
+                    $asset->delete();
+                });
+
+                foreach ($validated['assets'] as $assetData) {
+                    if (!empty($assetData['id'])) {
+                        $asset = Asset::find($assetData['id']);
+                        $asset->update([
+                            'name' => $assetData['name'],
+                            'path' => $assetData['path'],
+                            'type' => $assetData['type'] ?? $asset->type,
+                        ]);
+                    } else {
+                        $asset = Asset::create([
+                            'tema_id' => $tema->id,
+                            'name'    => $assetData['name'],
+                            'path'    => $assetData['path'],
+                            'type'    => $assetData['type'] ?? null,
+                        ]);
+                    }
+
+                    if (array_key_exists('sizes', $assetData)) {
+                        $asset->assetSizes()->delete();
+                        foreach ($assetData['sizes'] ?? [] as $sizeData) {
+                            $breakpoint = BreackPoin::where('code', $sizeData['breakpoint_code'])->first();
+                            AssetSize::create([
+                                'asset_id'       => $asset->id,
+                                'breack_poin_id' => $breakpoint->id,
+                                'size_tema_id'   => $sizeData['size_tema_id'],
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            if (array_key_exists('theme_colors', $validated)) {
+                $incomingColorIds = collect($validated['theme_colors'])->pluck('id')->filter()->values()->all();
+                ThemeColor::where('tema_id', $tema->id)->whereNotIn('id', $incomingColorIds)->delete();
+
+                foreach ($validated['theme_colors'] as $colorData) {
+                    if (!empty($colorData['id'])) {
+                        ThemeColor::where('id', $colorData['id'])->update([
+                            'key'   => $colorData['key'],
+                            'value' => $colorData['value'],
+                            'label' => $colorData['label'] ?? null,
+                            'group' => $colorData['group'] ?? null,
+                        ]);
+                    } else {
+                        ThemeColor::create([
+                            'tema_id' => $tema->id,
+                            'key'     => $colorData['key'],
+                            'value'   => $colorData['value'],
+                            'label'   => $colorData['label'] ?? null,
+                            'group'   => $colorData['group'] ?? null,
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => false,
+                'message' => 'Gagal mengupdate tema: ' . $e->getMessage(),
+            ], 500);
+        }
+
+        $tema->load(['assets.assetSizes.breakpoint', 'assets.assetSizes.sizeTema', 'themeColors']);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Tema berhasil diupdate',
+            'data'    => $tema,
+        ]);
     }
 
     /**

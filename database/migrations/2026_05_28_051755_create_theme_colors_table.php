@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             
             $table->unsignedBigInteger('tema_id')->nullable();
-             $table->string('key')->unique();
+             $table->string('key');
             $table->string('value', 50);
 
             $table->string('label')->nullable();
