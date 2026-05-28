@@ -86,6 +86,7 @@ class TemaController extends Controller
                 'code'   => $tema->code,
                 'name'   => $tema->name,
                 'assets' => $assets,
+                'themeColors' => $tema->themeColors,
             ],
         ]);
     }
