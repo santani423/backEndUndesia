@@ -54,7 +54,8 @@ class TemaController extends Controller
     {
         $tema = Tema::with([
             'assets.assetSizes.breakpoint',
-            'assets.assetSizes.sizeTema'
+            'assets.assetSizes.sizeTema',
+            'themeColors',
         ])->where('code', $tema)->first();
 
         if (!$tema) {
