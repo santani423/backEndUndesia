@@ -15,6 +15,7 @@ Route::post('/tema', [TemaController::class, 'store']);
 Route::get('/tema/{id}', [TemaController::class, 'show']);
 Route::put('/tema/{code}/full', [TemaController::class, 'updateByCode']);
 Route::delete('/tema/{code}', [TemaController::class, 'destroy']);
+Route::post('/tema/{code}/duplicate', [TemaController::class, 'duplicate']);
 Route::get('/domains', [DomainController::class, 'index']);
 Route::get('/domains/{id}', [DomainController::class, 'show']);
 Route::get('/komentar', [DomainController::class, 'komentarAll']);

@@ -134,6 +134,39 @@
     </div>
 </div>
 
+{{-- ===== MODAL DUPLIKAT TEMA ===== --}}
+<div class="modal fade" id="duplicateModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="bi bi-copy me-2"></i>Duplikat Tema</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-3">
+                    Salin semua data dari tema <strong id="dupSourceName"></strong> ke tema baru.
+                    Isi kode dan nama untuk tema baru.
+                </p>
+                <div class="mb-3">
+                    <label class="form-label" for="dupCode">Kode Tema Baru <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="dupCode" placeholder="Contoh: TEMA2">
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="dupName">Nama Tema Baru <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="dupName" placeholder="Nama tema baru">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-success px-4" onclick="confirmDuplicate()" id="btnDuplicate">
+                    <span id="btnDupText">Duplikat</span>
+                    <span id="btnDupSpinner" class="spinner-border spinner-border-sm ms-1 d-none"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- ===== MODAL KONFIRMASI HAPUS ===== --}}
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -217,6 +250,9 @@ async function loadTemas() {
                     ${(t.theme_colors ?? []).length > 4 ? `<small class="text-muted">+${t.theme_colors.length - 4}</small>` : ''}
                 </td>
                 <td class="pe-4 text-end">
+                    <button class="btn btn-sm btn-outline-success me-1" title="Duplikat Tema" onclick="openDuplicateModal('${t.code}','${t.name}')">
+                        <i class="bi bi-copy"></i>
+                    </button>
                     <button class="btn btn-sm btn-outline-primary me-1" onclick='openEditModal(${JSON.stringify(t)})'>
                         <i class="bi bi-pencil"></i>
                     </button>
@@ -599,6 +635,56 @@ async function confirmDelete() {
     } finally {
         document.getElementById('btnDelete').disabled = false;
         deleteCode = null;
+    }
+}
+
+// ── Duplicate ─────────────────────────────────────────────────────────────────
+let duplicateSourceCode = null;
+
+function openDuplicateModal(code, name) {
+    duplicateSourceCode = code;
+    document.getElementById('dupSourceName').textContent = name ?? code;
+    document.getElementById('dupCode').value = '';
+    document.getElementById('dupName').value = '';
+    new bootstrap.Modal(document.getElementById('duplicateModal')).show();
+}
+
+async function confirmDuplicate() {
+    const code = document.getElementById('dupCode').value.trim();
+    const name = document.getElementById('dupName').value.trim();
+    if (!code || !name) {
+        showToast('Kode dan Nama wajib diisi.', 'danger');
+        return;
+    }
+
+    const btn = document.getElementById('btnDuplicate');
+    const spinner = document.getElementById('btnDupSpinner');
+    const btnText = document.getElementById('btnDupText');
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+    btnText.textContent = 'Menduplikat…';
+
+    try {
+        const r = await fetch(`${API}/tema/${duplicateSourceCode}/duplicate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ code, name }),
+        });
+        const d = await r.json();
+        if (!r.ok) {
+            showToast(d.message ?? JSON.stringify(d.errors ?? d), 'danger');
+            return;
+        }
+        bootstrap.Modal.getInstance(document.getElementById('duplicateModal')).hide();
+        showToast(d.message ?? 'Tema berhasil diduplikat!', 'success');
+        loadTemas();
+    } catch {
+        showToast('Terjadi kesalahan jaringan.', 'danger');
+    } finally {
+        btn.disabled = false;
+        spinner.classList.add('d-none');
+        btnText.textContent = 'Duplikat';
+        duplicateSourceCode = null;
     }
 }
 

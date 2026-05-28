@@ -410,6 +410,80 @@ class TemaController extends Controller
     }
 
     /**
+     * Duplicate tema beserta assets, asset_sizes, dan theme_colors dari tema sumber.
+     */
+    public function duplicate(Request $request, string $sourceCode)
+    {
+        $source = Tema::with([
+            'assets.assetSizes',
+            'themeColors',
+        ])->where('code', $sourceCode)->first();
+
+        if (!$source) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Tema sumber tidak ditemukan',
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:200',
+            'code' => 'required|string|max:200|unique:temas,code',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $newTema = Tema::create([
+                'name' => $validated['name'],
+                'code' => $validated['code'],
+            ]);
+
+            foreach ($source->assets as $asset) {
+                $newAsset = Asset::create([
+                    'tema_id' => $newTema->id,
+                    'name'    => $asset->name,
+                    'path'    => $asset->path,
+                    'type'    => $asset->type,
+                ]);
+
+                foreach ($asset->assetSizes as $assetSize) {
+                    AssetSize::create([
+                        'asset_id'       => $newAsset->id,
+                        'breack_poin_id' => $assetSize->breack_poin_id,
+                        'size_tema_id'   => $assetSize->size_tema_id,
+                    ]);
+                }
+            }
+
+            foreach ($source->themeColors as $color) {
+                ThemeColor::create([
+                    'tema_id' => $newTema->id,
+                    'key'     => $color->key,
+                    'value'   => $color->value,
+                    'label'   => $color->label,
+                    'group'   => $color->group,
+                ]);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => false,
+                'message' => 'Gagal menduplikasi tema: ' . $e->getMessage(),
+            ], 500);
+        }
+
+        $newTema->load(['assets.assetSizes.breakpoint', 'assets.assetSizes.sizeTema', 'themeColors']);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Tema berhasil diduplikasi',
+            'data'    => $newTema,
+        ], 201);
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $code)
