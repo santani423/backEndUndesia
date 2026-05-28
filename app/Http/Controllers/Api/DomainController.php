@@ -109,6 +109,9 @@ class DomainController extends Controller
 
     public function rsvpAdd(Request $request)
     {
+        return response()->json([
+                'message' => 'RSVP berhasil ditambahkan', 
+            ], 200);
         $request->validate([
             'id_user' => 'required|integer',
             'slug' => 'nullable|string|max:255',
