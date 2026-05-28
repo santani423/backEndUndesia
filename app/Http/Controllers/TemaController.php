@@ -412,8 +412,28 @@ class TemaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tema $tema)
+    public function destroy(string $code)
     {
-        //
+        $tema = Tema::where('code', $code)->first();
+
+        if (!$tema) {
+            return response()->json(['status' => false, 'message' => 'Tema tidak ditemukan'], 404);
+        }
+
+        DB::beginTransaction();
+        try {
+            foreach ($tema->assets as $asset) {
+                $asset->assetSizes()->delete();
+                $asset->delete();
+            }
+            ThemeColor::where('tema_id', $tema->id)->delete();
+            $tema->delete();
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => false, 'message' => 'Gagal menghapus: ' . $e->getMessage()], 500);
+        }
+
+        return response()->json(['status' => true, 'message' => 'Tema berhasil dihapus']);
     }
 }
