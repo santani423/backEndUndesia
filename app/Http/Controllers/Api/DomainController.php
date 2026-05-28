@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Komen;
 use App\Models\Order;
+use App\Models\Rsvp;
 use App\Models\Tamu;
 use Illuminate\Http\Request;
 
@@ -108,26 +109,37 @@ class DomainController extends Controller
 
     public function rsvpAdd(Request $request)
     {
-        $request->validate([ 
-            'slug' => 'string|max:255',
-            'nama' => 'required|string|max:255', 
+        $request->validate([
+            'id_user' => 'required|integer',
+            'slug' => 'nullable|string|max:255',
+            'nama' => 'required|string|max:255',
             'kehadiran' => 'required|in:Hadir,Tidak Hadir',
-            'massage' => 'required|string|max:255', 
+            'massage' => 'required|string|max:255',
         ]);
 
         try {
+            $tamu = null;
 
-            $tamu = Tamu::where('nama_slug', $request->slug)->first();
+            if ($request->slug) {
+                $tamu = Tamu::where('nama_slug', $request->slug)
+                    ->where('id_user', $request->id_user)
+                    ->first();
 
-            if ($tamu) {
-               $tamu->update([ 
-                    'kehadiran' => $request->kehadiran, 
-                ]);
+                if ($tamu) {
+                    $tamu->update([
+                        'status' => $request->kehadiran,
+                    ]);
+                }
             }
+
+            $rsvp = Rsvp::create([
+                'tamu_id' => $tamu ? $tamu->id_tamu : null,
+                'massage' => $request->massage,
+            ]);
 
             return response()->json([
                 'message' => 'RSVP berhasil ditambahkan',
-                'data' => $tamu,
+                'data' => $rsvp,
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
