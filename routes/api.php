@@ -7,6 +7,8 @@ use App\Http\Controllers\SizeTemaController;
 use App\Http\Controllers\TemaController;
 use App\Http\Controllers\Api\DomainController;
 
+Route::middleware('api.key')->group(function () {
+
 Route::get('/demo', [DemoController::class, 'index']);
 Route::get('/size', [SizeTemaController::class, 'index']);
 Route::get('/brackPoin', [SizeTemaController::class, 'brackPoin']);
@@ -34,6 +36,6 @@ Route::get('/categories', [DemoController::class, 'categories']);
 Route::get('/template', [DemoController::class, 'FunctionName']);
 Route::get('/paket', [BaseController::class, 'paket']);
 
-
+}); // end api.key middleware
 
 // http://127.0.0.1:8000/api/documentation#/Demo
