@@ -22,7 +22,7 @@ class Tema1Seeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-
+        DB::table('theme_colors')->where('tema_id', $temaId)->delete();
         DB::table('theme_colors')->insert([
             ['tema_id' => $temaId, 'key' => 'panel_bg',      'value' => '#FCDDA6', 'label' => 'dialog / panel background',              'group' => 'surface'],
             ['tema_id' => $temaId, 'key' => 'surface_warm',  'value' => '#f8f1e7', 'label' => 'toast / QR card / warm surface',          'group' => 'surface'],
