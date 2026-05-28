@@ -13,7 +13,8 @@
         .table th { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: #6c757d; }
         .badge-color { display: inline-block; width: 18px; height: 18px; border-radius: 4px; border: 1px solid #dee2e6; vertical-align: middle; }
         .asset-row { background: #f8f9fa; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
-        .size-row { background: #fff; border-radius: 6px; padding: 8px; margin-bottom: 6px; }
+        .size-row { background: #fff; border-radius: 6px; padding: 6px 8px; margin-bottom: 4px; }
+        .size-header { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #adb5bd; padding: 0 4px 4px; }
         .color-row { background: #f8f9fa; border-radius: 8px; padding: 10px; margin-bottom: 8px; }
         .section-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #6c757d; margin-bottom: 8px; }
         .btn-remove { padding: 2px 7px; font-size: .75rem; }
@@ -190,29 +191,6 @@ async function loadSizeTemas() {
     }
 }
 
-// Populate semua select breakpoint yang ada di DOM
-function refreshBreakpointSelects() {
-    document.querySelectorAll('.size-bp').forEach(sel => {
-        const current = sel.value;
-        sel.innerHTML = '<option value="">-- pilih breakpoint --</option>'
-            + breakpoints.map(b =>
-                `<option value="${b.code}" ${current === b.code ? 'selected' : ''}>${b.code}${b.name ? ' — ' + b.name : ''}${b.sekala ? ' ('+b.sekala+')' : ''}</option>`
-            ).join('');
-        if (current) sel.value = current;
-    });
-}
-
-// Populate semua select size tema yang ada di DOM
-function refreshSizeTemaSelects() {
-    document.querySelectorAll('.size-st').forEach(sel => {
-        const current = sel.value;
-        sel.innerHTML = '<option value="">-- pilih size --</option>'
-            + sizeTemas.map(s =>
-                `<option value="${s.id}" ${current == s.id ? 'selected' : ''}>${s.type} — ${s.value}</option>`
-            ).join('');
-        if (current) sel.value = current;
-    });
-}
 
 async function loadTemas() {
     const tbody = document.getElementById('temaBody');
@@ -337,20 +315,23 @@ async function addAsset(data = null) {
                 <input type="text" class="form-control form-control-sm asset-type" value="${data?.type ?? ''}" placeholder="image">
             </div>
         </div>
-        <div class="d-flex align-items-center justify-content-between mb-1">
-            <span class="section-title">Ukuran (asset_sizes)</span>
-            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
-                onclick="addSize(${idx})" style="font-size:.72rem">
-                <i class="bi bi-plus"></i> Ukuran
-            </button>
+        <div class="d-flex align-items-center gap-2 size-header mt-1">
+            <span style="min-width:110px">Breakpoint</span>
+            <span style="flex:1">Size Tema</span>
+            <span style="width:38px"></span>
         </div>
         <div id="size-list-${idx}"></div>
     `;
     list.appendChild(div);
 
+    // Jika ada data existing, populate dari xMedia; jika tidak, generate otomatis semua breakpoint
     const xMedia = data?.xMedia ?? data?.asset_sizes ?? [];
-    for (const s of xMedia) {
-        await addSize(idx, s);
+    if (xMedia.length) {
+        for (const s of xMedia) {
+            await addOneSize(idx, s);
+        }
+    } else {
+        await addAllBreakpointSizes(idx);
     }
 }
 
@@ -368,50 +349,55 @@ function checkEmptyAssets() {
 }
 
 // ── Sizes ─────────────────────────────────────────────────────────────────────
-async function addSize(assetIdx, data = null) {
-    // Pastikan data master sudah terload sebelum render
+
+// Generate otomatis satu baris per breakpoint (tanpa data existing)
+async function addAllBreakpointSizes(aIdx) {
+    if (!breakpoints.length) await loadBreakpoints();
+    if (!sizeTemas.length)   await loadSizeTemas();
+    for (const bp of breakpoints) {
+        await addOneSize(aIdx, { device: bp.code });
+    }
+}
+
+// Tambah satu baris size (dengan atau tanpa data existing)
+async function addOneSize(aIdx, data = null) {
     if (!breakpoints.length) await loadBreakpoints();
     if (!sizeTemas.length)   await loadSizeTemas();
 
-    const sIdx = sizeCounters[assetIdx] ?? 0;
-    sizeCounters[assetIdx] = sIdx + 1;
-    const listEl = document.getElementById(`size-list-${assetIdx}`);
+    const sIdx = sizeCounters[aIdx] ?? 0;
+    sizeCounters[aIdx] = sIdx + 1;
+    const listEl = document.getElementById(`size-list-${aIdx}`);
     if (!listEl) return;
 
-    // Cari size_tema_id dari value string jika tidak ada id langsung
+    // Resolve size_tema_id: coba dari id langsung, lalu dari value string
     let selectedSizeId = data?.size_tema_id ?? '';
     if (!selectedSizeId && data?.size) {
         const match = sizeTemas.find(s => s.value === data.size);
         if (match) selectedSizeId = match.id;
     }
 
+    // Breakpoint untuk baris ini sudah ditentukan dari data
+    const lockedBp = data?.device ?? null;
+
+    const stOpts = sizeTemas.map(s =>
+        `<option value="${s.id}" ${selectedSizeId == s.id ? 'selected' : ''}>${s.type} — ${s.value}</option>`
+    ).join('');
+
     const div = document.createElement('div');
-    div.className = 'size-row d-flex gap-2 align-items-end';
-    div.id = `size-${assetIdx}-${sIdx}`;
+    div.className = 'size-row d-flex gap-2 align-items-center mb-1';
+    div.id = `size-${aIdx}-${sIdx}`;
     div.innerHTML = `
-        <div style="flex:1.2">
-            <label class="form-label small mb-1">Breakpoint</label>
-            <select class="form-select form-select-sm size-bp">
-                <option value="">-- pilih breakpoint --</option>
-                ${breakpoints.map(b =>
-                    `<option value="${b.code}" ${data?.device === b.code ? 'selected' : ''}>
-                        ${b.code}${b.name ? ' — ' + b.name : ''}${b.sekala ? ' (' + b.sekala + ')' : ''}
-                    </option>`
-                ).join('')}
-            </select>
+        <div class="input-group-text rounded px-2 py-1 bg-white border" style="min-width:110px;font-size:.8rem;font-weight:600">
+            <i class="bi bi-display me-1 text-muted"></i>${lockedBp ?? '—'}
+            <input type="hidden" class="size-bp" value="${lockedBp ?? ''}">
         </div>
-        <div style="flex:2">
-            <label class="form-label small mb-1">Size Tema</label>
+        <div style="flex:1">
             <select class="form-select form-select-sm size-st">
                 <option value="">-- pilih size --</option>
-                ${sizeTemas.map(s =>
-                    `<option value="${s.id}" ${selectedSizeId == s.id ? 'selected' : ''}>
-                        ${s.type} — ${s.value}
-                    </option>`
-                ).join('')}
+                ${stOpts}
             </select>
         </div>
-        <button type="button" class="btn btn-outline-danger btn-remove align-self-end" onclick="removeSize('${assetIdx}-${sIdx}')">
+        <button type="button" class="btn btn-outline-danger btn-remove py-1 px-2" onclick="removeSize('${aIdx}-${sIdx}')">
             <i class="bi bi-x"></i>
         </button>
     `;
