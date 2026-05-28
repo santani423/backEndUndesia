@@ -15,6 +15,7 @@ class Tema1Seeder extends Seeder
         DB::table('temas')->truncate();
         DB::table('assets')->truncate();
         DB::table('asset_sizes')->truncate();
+        DB::table('theme_colors')->truncate();
 
         $temaId = DB::table('temas')->insertGetId([
             'name'       => 'Tema 1',
@@ -42,7 +43,7 @@ class Tema1Seeder extends Seeder
 
         $this->insertAssets($temaId);
 
-        $assets      = Asset::where('tema_id', $temaId)->get()->keyBy('name');
+        $assets      = Asset::where('tema_id', $temaId)->where('type', 'item')->get()->keyBy('name');
         $breakpoints = BreackPoin::all()->keyBy('code');
 
         $insertData = $this->buildAssetSizes($assets, $breakpoints);
@@ -53,6 +54,7 @@ class Tema1Seeder extends Seeder
     private function insertAssets(int $temaId): void
     {
         $names = ['clothes-rack', 'address', 'rsvp', 'couple', 'love-story', 'gift', 'gallery'];
+        $bg = ['background', 'welcome', 'bg-welcome'];
 
         foreach ($names as $name) {
             DB::table('assets')->insert([
@@ -60,6 +62,17 @@ class Tema1Seeder extends Seeder
                 'path'       => '/storages/Thems/TEMA1/' . $name . '.webp',
                 'name'       => $name,
                 'type'       => 'item',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        foreach ($bg as $name) {
+            DB::table('assets')->insert([
+                'tema_id'    => $temaId,
+                'path'       => '/storages/Thems/TEMA1/' . $name . '.webp',
+                'name'       => $name,
+                'type'       =>  $name,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
