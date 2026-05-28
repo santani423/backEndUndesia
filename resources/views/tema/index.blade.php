@@ -13,8 +13,9 @@
         .table th { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: #6c757d; }
         .badge-color { display: inline-block; width: 18px; height: 18px; border-radius: 4px; border: 1px solid #dee2e6; vertical-align: middle; }
         .asset-row { background: #f8f9fa; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
-        .size-row { background: #fff; border-radius: 6px; padding: 6px 8px; margin-bottom: 4px; }
-        .size-header { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #adb5bd; padding: 0 4px 4px; }
+        .size-row { background: #fff; border-radius: 6px; padding: 5px 8px; margin-bottom: 3px; }
+        .size-header { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #adb5bd; }
+        #size-list-0, [id^="size-list-"] { max-height: 320px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 8px; padding: 6px; background: #f8f9fa; }
         .color-row { background: #f8f9fa; border-radius: 8px; padding: 10px; margin-bottom: 8px; }
         .section-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #6c757d; margin-bottom: 8px; }
         .btn-remove { padding: 2px 7px; font-size: .75rem; }
@@ -315,23 +316,16 @@ async function addAsset(data = null) {
                 <input type="text" class="form-control form-control-sm asset-type" value="${data?.type ?? ''}" placeholder="image">
             </div>
         </div>
-        <div class="d-flex align-items-center gap-2 size-header mt-1">
-            <span style="min-width:110px">Breakpoint</span>
-            <span style="flex:1">Size Tema</span>
-            <span style="width:38px"></span>
-        </div>
         <div id="size-list-${idx}"></div>
     `;
     list.appendChild(div);
 
-    // Jika ada data existing, populate dari xMedia; jika tidak, generate otomatis semua breakpoint
+    // Jika ada data existing, populate dari xMedia; jika tidak, generate otomatis semua kombinasi
     const xMedia = data?.xMedia ?? data?.asset_sizes ?? [];
     if (xMedia.length) {
-        for (const s of xMedia) {
-            await addOneSize(idx, s);
-        }
+        await buildSizeGrid(idx, xMedia);
     } else {
-        await addAllBreakpointSizes(idx);
+        await buildSizeGrid(idx, []);
     }
 }
 
@@ -349,59 +343,77 @@ function checkEmptyAssets() {
 }
 
 // ── Sizes ─────────────────────────────────────────────────────────────────────
+const SIZE_TYPES = ['top', 'bottom', 'right', 'left', 'w'];
 
-// Generate otomatis satu baris per breakpoint (tanpa data existing)
-async function addAllBreakpointSizes(aIdx) {
-    if (!breakpoints.length) await loadBreakpoints();
-    if (!sizeTemas.length)   await loadSizeTemas();
-    for (const bp of breakpoints) {
-        await addOneSize(aIdx, { device: bp.code });
-    }
-}
-
-// Tambah satu baris size (dengan atau tanpa data existing)
-async function addOneSize(aIdx, data = null) {
+// Render grid ukuran: satu baris per kombinasi Breakpoint × Type
+// existing: array xMedia [ { device, size, size_tema_id } ]
+async function buildSizeGrid(aIdx, existing = []) {
     if (!breakpoints.length) await loadBreakpoints();
     if (!sizeTemas.length)   await loadSizeTemas();
 
-    const sIdx = sizeCounters[aIdx] ?? 0;
-    sizeCounters[aIdx] = sIdx + 1;
     const listEl = document.getElementById(`size-list-${aIdx}`);
     if (!listEl) return;
+    listEl.innerHTML = '';
+    sizeCounters[aIdx] = 0;
 
-    // Resolve size_tema_id: coba dari id langsung, lalu dari value string
-    let selectedSizeId = data?.size_tema_id ?? '';
-    if (!selectedSizeId && data?.size) {
-        const match = sizeTemas.find(s => s.value === data.size);
-        if (match) selectedSizeId = match.id;
-    }
-
-    // Breakpoint untuk baris ini sudah ditentukan dari data
-    const lockedBp = data?.device ?? null;
-
-    const stOpts = sizeTemas.map(s =>
-        `<option value="${s.id}" ${selectedSizeId == s.id ? 'selected' : ''}>${s.type} — ${s.value}</option>`
-    ).join('');
-
-    const div = document.createElement('div');
-    div.className = 'size-row d-flex gap-2 align-items-center mb-1';
-    div.id = `size-${aIdx}-${sIdx}`;
-    div.innerHTML = `
-        <div class="input-group-text rounded px-2 py-1 bg-white border" style="min-width:110px;font-size:.8rem;font-weight:600">
-            <i class="bi bi-display me-1 text-muted"></i>${lockedBp ?? '—'}
-            <input type="hidden" class="size-bp" value="${lockedBp ?? ''}">
-        </div>
-        <div style="flex:1">
-            <select class="form-select form-select-sm size-st">
-                <option value="">-- pilih size --</option>
-                ${stOpts}
-            </select>
-        </div>
-        <button type="button" class="btn btn-outline-danger btn-remove py-1 px-2" onclick="removeSize('${aIdx}-${sIdx}')">
-            <i class="bi bi-x"></i>
-        </button>
+    // Header kolom
+    const hdr = document.createElement('div');
+    hdr.className = 'd-flex align-items-center gap-2 size-header px-1 mb-1';
+    hdr.innerHTML = `
+        <span style="min-width:80px">Breakpoint</span>
+        <span style="min-width:70px">Tipe</span>
+        <span style="flex:1">Ukuran</span>
     `;
-    listEl.appendChild(div);
+    listEl.appendChild(hdr);
+
+    for (const bp of breakpoints) {
+        for (const type of SIZE_TYPES) {
+            const sIdx = sizeCounters[aIdx];
+            sizeCounters[aIdx] = sIdx + 1;
+
+            // Cari data existing untuk kombinasi breakpoint + type ini
+            let selectedId = '';
+            for (const e of existing) {
+                if (e.device !== bp.code) continue;
+                // Cek via size_tema_id
+                if (e.size_tema_id) {
+                    const st = sizeTemas.find(s => s.id == e.size_tema_id);
+                    if (st?.type === type) { selectedId = e.size_tema_id; break; }
+                }
+                // Cek via value string (dari xMedia show API)
+                if (e.size) {
+                    const st = sizeTemas.find(s => s.type === type && s.value === e.size);
+                    if (st) { selectedId = st.id; break; }
+                }
+            }
+
+            // Options hanya untuk type ini, urutkan by no
+            const opts = sizeTemas
+                .filter(s => s.type === type)
+                .sort((a, b) => (a.no ?? 0) - (b.no ?? 0))
+                .map(s => `<option value="${s.id}" ${selectedId == s.id ? 'selected' : ''}>${s.value}</option>`)
+                .join('');
+
+            const div = document.createElement('div');
+            div.className = 'size-row d-flex gap-2 align-items-center';
+            div.id = `size-${aIdx}-${sIdx}`;
+            div.setAttribute('data-bp', bp.code);
+            div.setAttribute('data-type', type);
+            div.innerHTML = `
+                <input type="hidden" class="size-bp" value="${bp.code}">
+                <input type="hidden" class="size-type" value="${type}">
+                <span class="badge bg-secondary" style="min-width:80px;font-size:.72rem">${bp.code}${bp.sekala ? '<br><small class=\'fw-normal\'>' + bp.sekala + '</small>' : ''}</span>
+                <span class="badge bg-light text-dark border" style="min-width:70px;font-size:.72rem">${type}</span>
+                <div style="flex:1">
+                    <select class="form-select form-select-sm size-st">
+                        <option value="">— pilih —</option>
+                        ${opts}
+                    </select>
+                </div>
+            `;
+            listEl.appendChild(div);
+        }
+    }
 }
 
 function removeSize(id) {
@@ -484,6 +496,7 @@ function collectPayload() {
             const bp = sRow.querySelector('.size-bp').value;
             const st = sRow.querySelector('.size-st').value;
             if (bp && st) sizes.push({ breakpoint_code: bp, size_tema_id: parseInt(st) });
+            // baris tanpa size dipilih diabaikan
         });
         const asset = {
             name:  row.querySelector('.asset-name').value,
