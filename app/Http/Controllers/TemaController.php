@@ -261,6 +261,7 @@ class TemaController extends Controller
                 'id'     => $asset->id,
                 'name'   => $asset->name,
                 'src'    => $asset->path,
+                'type'    => $asset->type,
                 'xMedia' => $asset->assetSizes->map(function ($assetSize) {
                     return [
                         'device' => $assetSize->breakpoint?->code,
