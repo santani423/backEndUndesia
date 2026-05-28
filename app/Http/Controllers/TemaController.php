@@ -24,8 +24,9 @@ class TemaController extends Controller
 
         $query = Tema::with([
             'assets.assetSizes.breakpoint',
-            'assets.assetSizes.sizeTema'
-        ])->where('code', 'TEMA1')->get();
+            'assets.assetSizes.sizeTema',
+            'themeColors',
+        ])->get();
 
         return response()->json([
             'message' => 'List of themes',
