@@ -42,11 +42,11 @@ class DomainController extends Controller
         $slug = $request->query('slug');
         $tamu = Tamu::with('rsvp')->where('nama_slug', $slug)->where('id_user', $domain->id_user)->first();
             
-        if (!$tamu) {
-            return response()->json([
-                'message' => 'Tamu not found',
-            ], 404);
-        }
+        // if (!$tamu) {
+        //     return response()->json([
+        //         'message' => 'Tamu not found',
+        //     ], 404);
+        // }
 
         if (!$domain) {
             return response()->json([
@@ -56,7 +56,7 @@ class DomainController extends Controller
         return response()->json([
             'message' => 'Domain details',
             'data' => $domain,
-            'tamu' => $tamu,
+            'tamu' => $tamu ,
         ]);
     }
 
