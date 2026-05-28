@@ -33,7 +33,7 @@ class DomainController extends Controller
             'user.rules',
         )->where('domain', $id)->first();
 
-        $tamu = Tamu::where('nama_slug', $request->slug)->where('id_user', $domain->id_user)->first();
+        $tamu = Tamu::with('rsvp')->where('nama_slug', $request->slug)->where('id_user', $domain->id_user)->first();
 
         if (!$domain) {
             return response()->json([
@@ -140,7 +140,7 @@ class DomainController extends Controller
                 }
             }
             if ($tamu) {
-                $rsvp = Rsvp::where('tamu_id', $tamu->id_tamu)->first();
+                $rsvp = $tamu->rsvp;
 
                 if ($rsvp) {
                     $rsvp->update(['massage' => $request->massage]);
