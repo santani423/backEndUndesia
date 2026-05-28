@@ -23,6 +23,23 @@ class Tema1Seeder extends Seeder
             'updated_at' => now(),
         ]);
 
+        DB::table('theme_colors')->insert([
+            ['tema_id' => $temaId, 'key' => 'panel_bg',      'value' => '#FCDDA6', 'label' => 'dialog / panel background',              'group' => 'surface'],
+            ['tema_id' => $temaId, 'key' => 'surface_warm',  'value' => '#f8f1e7', 'label' => 'toast / QR card / warm surface',          'group' => 'surface'],
+            ['tema_id' => $temaId, 'key' => 'overlay_dark',  'value' => '#3b1a0a', 'label' => 'offline alert overlay',                   'group' => 'surface'],
+            ['tema_id' => $temaId, 'key' => 'brand_primary', 'value' => '#9F6326', 'label' => 'dialog headers, action buttons',          'group' => 'brand'],
+            ['tema_id' => $temaId, 'key' => 'cta',           'value' => '#8b4513', 'label' => 'primary CTA button (welcome screen)',     'group' => 'brand'],
+            ['tema_id' => $temaId, 'key' => 'heading',       'value' => '#4a2d16', 'label' => 'primary headings / couple names',         'group' => 'text'],
+            ['tema_id' => $temaId, 'key' => 'label',         'value' => '#b07a3f', 'label' => 'guest name / prominent label',            'group' => 'text'],
+            ['tema_id' => $temaId, 'key' => 'body_warm',     'value' => '#5a4330', 'label' => 'supporting body text',                    'group' => 'text'],
+            ['tema_id' => $temaId, 'key' => 'caption',       'value' => '#8b6b3f', 'label' => 'small captions / access labels',          'group' => 'text'],
+            ['tema_id' => $temaId, 'key' => 'on_dark',       'value' => '#f8d9b0', 'label' => 'text on dark (offline alert)',            'group' => 'text'],
+            ['tema_id' => $temaId, 'key' => 'success_warm',  'value' => '#7a4a1a', 'label' => 'success toast text',                     'group' => 'text'],
+            ['tema_id' => $temaId, 'key' => 'brand_gold',    'value' => '#c79b57', 'label' => 'gold accent — stars, separators',        'group' => 'decorative'],
+            ['tema_id' => $temaId, 'key' => 'icon_accent',   'value' => '#c87941', 'label' => 'icon highlight',                         'group' => 'decorative'],
+            ['tema_id' => $temaId, 'key' => 'divider',       'value' => '#d8b98d', 'label' => 'divider',                                'group' => 'decorative'],
+        ]);
+
         $this->insertAssets($temaId);
 
         $assets      = Asset::where('tema_id', $temaId)->get()->keyBy('name');
