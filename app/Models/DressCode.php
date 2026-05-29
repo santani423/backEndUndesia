@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DressCode extends Model
 {
-    protected $table = 'dress_code';
+    protected $table = 'dress_codes';
 
     public function user()
     {
