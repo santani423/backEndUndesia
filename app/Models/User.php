@@ -85,4 +85,11 @@ class User extends Authenticatable
     {
         return $this->hasOne(Rules::class, 'id_user');
     }
+
+    public function dressCode()
+    {
+        return $this->hasOne(DressCode::class, 'id_user');
+    }
+
+    
 }
