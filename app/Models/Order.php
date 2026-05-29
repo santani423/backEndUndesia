@@ -12,4 +12,9 @@ class Order extends Model
      {
          return $this->belongsTo(User::class, 'id_user');
      }
+
+     public function dressCode()
+    {
+        return $this->hasOne(DressCode::class, 'id','order_id');
+    }
 }
