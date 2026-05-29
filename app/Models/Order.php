@@ -13,8 +13,5 @@ class Order extends Model
          return $this->belongsTo(User::class, 'id_user');
      }
 
-     public function dressCode()
-    {
-        return $this->belongsTo(DressCode::class, 'order_id','id');
-    }
+     
 }

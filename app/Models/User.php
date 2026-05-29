@@ -86,7 +86,10 @@ class User extends Authenticatable
         return $this->hasOne(Rules::class, 'id_user');
     }
 
-    
+    public function dressCode()
+    {
+        return $this->hasOne(DressCode::class, 'order_id'); // order id sebenarnya adalah id_user, tapi karena relasi di DressCode menggunakan order_id, maka kita sesuaikan dengan itu
+    }
 
     
 }

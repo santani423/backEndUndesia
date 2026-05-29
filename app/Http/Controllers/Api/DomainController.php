@@ -31,9 +31,9 @@ class DomainController extends Controller
             'user.acara',
             'user.rekening',
             'user.rules',
-            'dressCode',
-            'dressCode.codeItem',
-            'dressCode.codePalette'
+            'user.dressCode',
+            'user.dressCode.codeItem',
+            'user.dressCode.codePalette'
         )->where('domain', $id)->first();
 
         if (!$domain) {
