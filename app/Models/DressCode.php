@@ -11,10 +11,10 @@ class DressCode extends Model
     
     public function codeItem()
     {
-        return $this->hasOne(DressCodeItem::class, 'dress_code_id');
+        return $this->hasMany(DressCodeItem::class, 'dress_code_id');
     }
     public function codePalette()
     {
-        return $this->hasOne(DressCodePalette::class, 'dress_code_id');
+        return $this->hasMany(DressCodePalette::class, 'dress_code_id');
     }
 }
