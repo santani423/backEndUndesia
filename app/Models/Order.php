@@ -15,6 +15,6 @@ class Order extends Model
 
      public function dressCode()
     {
-        return $this->hasOne(DressCode::class, 'id','order_id');
+        return $this->hasOne(DressCode::class, 'order_id','id');
     }
 }
