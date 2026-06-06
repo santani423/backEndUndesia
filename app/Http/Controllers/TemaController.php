@@ -260,7 +260,7 @@ class TemaController extends Controller
             return [
                 'id'     => $asset->id,
                 'name'   => $asset->name,
-                'src'    => $asset->path,
+                'src'    => '/storage/' . $asset->path,
                 'type'    => $asset->type,
                 'xMedia' => $asset->assetSizes->map(function ($assetSize) {
                     return [
