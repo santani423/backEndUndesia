@@ -20,6 +20,11 @@
         .section-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #6c757d; margin-bottom: 8px; }
         .btn-remove { padding: 2px 7px; font-size: .75rem; }
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .asset-preview-wrap { position: relative; display: inline-block; }
+        .asset-preview { max-height: 100px; max-width: 180px; border-radius: 6px; border: 1px solid #dee2e6; object-fit: contain; background: #f8f9fa; }
+        .asset-preview-placeholder { width: 80px; height: 80px; border: 2px dashed #dee2e6; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #adb5bd; font-size: 1.5rem; background: #f8f9fa; }
+        .upload-btn-wrap { position: relative; overflow: hidden; }
+        .upload-btn-wrap input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
@@ -345,12 +350,25 @@ async function addAsset(data = null) {
             </div>
             <div class="col-md-5">
                 <label class="form-label small">Path / URL</label>
-                <input type="text" class="form-control form-control-sm asset-path" value="${data?.src ?? data?.path ?? ''}" placeholder="/images/bg.jpg">
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control form-control-sm asset-path" value="${data?.src ?? data?.path ?? ''}"
+                        placeholder="/images/bg.jpg" oninput="previewFromUrl(${idx}, this.value)">
+                    <span class="upload-btn-wrap">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" tabindex="-1" title="Upload Gambar">
+                            <i class="bi bi-upload"></i>
+                        </button>
+                        <input type="file" accept="image/*" onchange="handleAssetUpload(${idx}, this)">
+                    </span>
+                </div>
             </div>
             <div class="col-md-3">
                 <label class="form-label small">Tipe</label>
                 <input type="text" class="form-control form-control-sm asset-type" value="${data?.type ?? ''}" placeholder="image">
             </div>
+        </div>
+        <div class="mb-2" id="preview-wrap-${idx}">
+            <label class="form-label small d-block">Preview</label>
+            ${(data?.src ?? data?.path) ? `<img src="${data?.src ?? data?.path}" class="asset-preview" id="asset-preview-${idx}" alt="preview">` : `<div class="asset-preview-placeholder" id="asset-preview-${idx}"><i class="bi bi-image"></i></div>`}
         </div>
         <div id="size-list-${idx}"></div>
     `;
@@ -375,6 +393,67 @@ async function addAsset(data = null) {
         }));
     }
     await buildSizeGrid(idx, xMedia);
+}
+
+function setPreviewEl(idx, src) {
+    const wrap = document.getElementById(`preview-wrap-${idx}`);
+    if (!wrap) return;
+    let el = document.getElementById(`asset-preview-${idx}`);
+    if (src) {
+        if (!el || el.tagName !== 'IMG') {
+            const img = document.createElement('img');
+            img.className = 'asset-preview';
+            img.id = `asset-preview-${idx}`;
+            img.alt = 'preview';
+            if (el) el.replaceWith(img);
+            el = img;
+        }
+        el.src = src;
+        el.onerror = () => { el.src = ''; el.alt = 'Gambar tidak dapat dimuat'; };
+    } else {
+        if (!el || el.tagName === 'IMG') {
+            const ph = document.createElement('div');
+            ph.className = 'asset-preview-placeholder';
+            ph.id = `asset-preview-${idx}`;
+            ph.innerHTML = '<i class="bi bi-image"></i>';
+            if (el) el.replaceWith(ph);
+        }
+    }
+}
+
+function previewFromUrl(idx, url) {
+    setPreviewEl(idx, url.trim() || null);
+}
+
+function handleAssetUpload(idx, input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    // Tampilkan preview lokal segera
+    const reader = new FileReader();
+    reader.onload = e => setPreviewEl(idx, e.target.result);
+    reader.readAsDataURL(file);
+
+    // Upload ke server
+    const formData = new FormData();
+    formData.append('file', file);
+
+    showToast('Mengupload gambar…', 'info');
+    fetch(`${API}/upload-asset`, { method: 'POST', body: formData })
+        .then(r => r.ok ? r.json() : Promise.reject(r))
+        .then(d => {
+            const url = d.url ?? d.path ?? d.data?.url ?? d.data?.path ?? '';
+            if (url) {
+                const pathInput = document.getElementById(`asset-${idx}`)?.querySelector('.asset-path');
+                if (pathInput) { pathInput.value = url; setPreviewEl(idx, url); }
+                showToast('Gambar berhasil diupload.', 'success');
+            } else {
+                showToast('Upload sukses tetapi URL tidak ditemukan.', 'warning');
+            }
+        })
+        .catch(() => showToast('Upload gagal. Path lokal digunakan untuk preview.', 'warning'));
+
+    input.value = '';
 }
 
 function removeAsset(idx) {

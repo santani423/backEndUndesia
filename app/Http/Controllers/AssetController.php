@@ -4,60 +4,54 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AssetController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Upload gambar aset dan simpan ke storage/app/public/assets.
+     * POST /api/upload-asset
+     * Body: multipart/form-data, field "file"
+     * Response: { url: "/storage/assets/xxx.jpg", path: "assets/xxx.jpg" }
      */
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'image', 'max:5120'], // maks 5 MB
+        ]);
+
+        $file      = $request->file('file');
+        $ext       = $file->getClientOriginalExtension();
+        $filename  = Str::uuid() . '.' . $ext;
+        $storedPath = $file->storeAs('assets', $filename, 'public');
+
+        return response()->json([
+            'url'  => Storage::disk('public')->url($storedPath),
+            'path' => $storedPath,
+        ]);
+    }
+
     public function index()
     {
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Asset $asset)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Asset $asset)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Asset $asset)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Asset $asset)
     {
         //

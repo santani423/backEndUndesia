@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\DemoController;
 use App\Http\Controllers\SizeTemaController;
 use App\Http\Controllers\TemaController;
+use App\Http\Controllers\AssetController;
 use App\Http\Controllers\Api\DomainController;
 
 Route::middleware('api.key')->group(function () {
@@ -18,6 +19,7 @@ Route::get('/tema/{id}', [TemaController::class, 'show']);
 Route::put('/tema/{code}/full', [TemaController::class, 'updateByCode']);
 Route::delete('/tema/{code}', [TemaController::class, 'destroy']);
 Route::post('/tema/{code}/duplicate', [TemaController::class, 'duplicate']);
+Route::post('/upload-asset', [AssetController::class, 'uploadImage']);
 Route::get('/domains', [DomainController::class, 'index']);
 Route::get('/domains/{id}', [DomainController::class, 'show']);
 Route::get('/komentar', [DomainController::class, 'komentarAll']);
