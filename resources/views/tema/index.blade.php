@@ -20,11 +20,8 @@
         .section-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #6c757d; margin-bottom: 8px; }
         .btn-remove { padding: 2px 7px; font-size: .75rem; }
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
-        .asset-preview-wrap { position: relative; display: inline-block; }
         .asset-preview { max-height: 100px; max-width: 180px; border-radius: 6px; border: 1px solid #dee2e6; object-fit: contain; background: #f8f9fa; }
         .asset-preview-placeholder { width: 80px; height: 80px; border: 2px dashed #dee2e6; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #adb5bd; font-size: 1.5rem; background: #f8f9fa; }
-        .upload-btn-wrap { position: relative; overflow: hidden; }
-        .upload-btn-wrap input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
@@ -353,13 +350,11 @@ async function addAsset(data = null) {
                 <div class="input-group input-group-sm">
                     <input type="text" class="form-control form-control-sm asset-path" value="${data?.src ?? data?.path ?? ''}"
                         placeholder="/images/bg.jpg" oninput="previewFromUrl(${idx}, this.value)">
-                    <span class="upload-btn-wrap">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" tabindex="-1" title="Upload Gambar">
-                            <i class="bi bi-upload"></i>
-                        </button>
-                        <input type="file" accept="image/*" onchange="handleAssetUpload(${idx}, this)">
-                    </span>
+                    <label class="btn btn-outline-secondary btn-sm mb-0" for="file-asset-${idx}" title="Upload Gambar" style="cursor:pointer">
+                        <i class="bi bi-upload"></i>
+                    </label>
                 </div>
+                <input type="file" id="file-asset-${idx}" accept="image/*" class="d-none" onchange="handleAssetUpload(${idx}, this)">
             </div>
             <div class="col-md-3">
                 <label class="form-label small">Tipe</label>
@@ -425,35 +420,46 @@ function previewFromUrl(idx, url) {
     setPreviewEl(idx, url.trim() || null);
 }
 
-function handleAssetUpload(idx, input) {
+async function handleAssetUpload(idx, input) {
     const file = input.files[0];
     if (!file) return;
+    input.value = '';
 
-    // Tampilkan preview lokal segera
+    // Preview lokal segera
     const reader = new FileReader();
     reader.onload = e => setPreviewEl(idx, e.target.result);
     reader.readAsDataURL(file);
 
-    // Upload ke server
+    // Tampilkan loading pada tombol upload
+    const label = document.querySelector(`label[for="file-asset-${idx}"]`);
+    if (label) { label.innerHTML = '<span class="spinner-border spinner-border-sm"></span>'; label.style.pointerEvents = 'none'; }
+
     const formData = new FormData();
     formData.append('file', file);
 
-    showToast('Mengupload gambar…', 'info');
-    fetch(`${API}/upload-asset`, { method: 'POST', body: formData })
-        .then(r => r.ok ? r.json() : Promise.reject(r))
-        .then(d => {
-            const url = d.url ?? d.path ?? d.data?.url ?? d.data?.path ?? '';
-            if (url) {
-                const pathInput = document.getElementById(`asset-${idx}`)?.querySelector('.asset-path');
-                if (pathInput) { pathInput.value = url; setPreviewEl(idx, url); }
-                showToast('Gambar berhasil diupload.', 'success');
-            } else {
-                showToast('Upload sukses tetapi URL tidak ditemukan.', 'warning');
-            }
-        })
-        .catch(() => showToast('Upload gagal. Path lokal digunakan untuk preview.', 'warning'));
+    try {
+        const r = await fetch(`${API}/upload-asset`, { method: 'POST', body: formData });
+        const d = await r.json().catch(() => ({}));
 
-    input.value = '';
+        if (!r.ok) {
+            const msg = d.message ?? (d.errors ? Object.values(d.errors).flat().join(' ') : `Error ${r.status}`);
+            showToast('Upload gagal: ' + msg, 'danger');
+            return;
+        }
+
+        const url = d.url ?? d.path ?? d.data?.url ?? d.data?.path ?? '';
+        if (url) {
+            const pathInput = document.getElementById(`asset-${idx}`)?.querySelector('.asset-path');
+            if (pathInput) { pathInput.value = url; setPreviewEl(idx, url); }
+            showToast('Gambar berhasil diupload.', 'success');
+        } else {
+            showToast('Upload sukses tapi URL tidak ditemukan dalam response.', 'warning');
+        }
+    } catch (e) {
+        showToast('Upload gagal: ' + (e.message ?? 'kesalahan jaringan'), 'danger');
+    } finally {
+        if (label) { label.innerHTML = '<i class="bi bi-upload"></i>'; label.style.pointerEvents = ''; }
+    }
 }
 
 function removeAsset(idx) {
