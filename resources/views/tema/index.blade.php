@@ -434,8 +434,13 @@ async function handleAssetUpload(idx, input) {
     const label = document.querySelector(`label[for="file-asset-${idx}"]`);
     if (label) { label.innerHTML = '<span class="spinner-border spinner-border-sm"></span>'; label.style.pointerEvents = 'none'; }
 
+    const temaNama = document.getElementById('fCode')?.value.trim()
+                   || document.getElementById('fName')?.value.trim()
+                   || 'default';
+
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('tema_name', temaNama);
 
     try {
         const r = await fetch(`${API}/upload-asset`, { method: 'POST', body: formData });
