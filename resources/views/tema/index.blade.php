@@ -363,7 +363,7 @@ async function addAsset(data = null) {
         </div>
         <div class="mb-2" id="preview-wrap-${idx}">
             <label class="form-label small d-block">Preview</label>
-            ${(data?.src ?? data?.path) ? `<img src="${data?.src ?? data?.path}" class="asset-preview" id="asset-preview-${idx}" alt="preview">` : `<div class="asset-preview-placeholder" id="asset-preview-${idx}"><i class="bi bi-image"></i></div>`}
+            ${(data?.src ?? data?.path) ? `<img src="${toPreviewUrl(data?.src ?? data?.path)}" class="asset-preview" id="asset-preview-${idx}" alt="preview">` : `<div class="asset-preview-placeholder" id="asset-preview-${idx}"><i class="bi bi-image"></i></div>`}
         </div>
         <div id="size-list-${idx}"></div>
     `;
@@ -416,8 +416,20 @@ function setPreviewEl(idx, src) {
     }
 }
 
+// Konversi path tersimpan (themes/X/file.jpg) → URL yang bisa ditampilkan browser.
+// Jika sudah berupa URL lengkap atau path /storage/... biarkan apa adanya.
+function toPreviewUrl(path) {
+    if (!path) return null;
+    const p = path.trim();
+    if (!p) return null;
+    if (p.startsWith('http://') || p.startsWith('https://') || p.startsWith('data:')) return p;
+    if (p.startsWith('/storage/') || p.startsWith('/images/') || p.startsWith('/assets/')) return p;
+    // Path relatif dari disk public: themes/X/file.jpg → /storage/themes/X/file.jpg
+    return '/storage/' + p.replace(/^\/+/, '');
+}
+
 function previewFromUrl(idx, url) {
-    setPreviewEl(idx, url.trim() || null);
+    setPreviewEl(idx, toPreviewUrl(url));
 }
 
 async function handleAssetUpload(idx, input) {
