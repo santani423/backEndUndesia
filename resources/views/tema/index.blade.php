@@ -455,7 +455,7 @@ async function handleAssetUpload(idx, input) {
         const url = d.url ?? d.path ?? d.data?.url ?? d.data?.path ?? '';
         if (url) {
             const pathInput = document.getElementById(`asset-${idx}`)?.querySelector('.asset-path');
-            if (pathInput) { pathInput.value = url; setPreviewEl(idx, url); }
+            if (pathInput) { pathInput.value = d.path; setPreviewEl(idx, url); }
             showToast('Gambar berhasil diupload.', 'success');
         } else {
             showToast('Upload sukses tapi URL tidak ditemukan dalam response.', 'warning');
