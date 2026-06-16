@@ -28,7 +28,7 @@ Route::get('/tamu/{id}/{slug}', [DomainController::class, 'tamu']);
 Route::put('/tema', [TemaController::class, 'edit']);
 Route::put('/tema/{id}', [TemaController::class, 'update']);
 
-Route::put('/tamu', [DomainController::class, 'rsv  pAdd']);
+Route::put('/tamu', [DomainController::class, 'rsvpAdd']);
 
 Route::get('/testimonials', [DemoController::class, 'testimonials']);
 Route::get('/themes', [DemoController::class, 'themes']);
